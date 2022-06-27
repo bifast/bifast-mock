@@ -1,0 +1,43 @@
+# Reverse Credit Transfer Request from channel
+POST http://localhost:9002/services/komi/reversect HTTP/1.1
+Content-Type: application/json
+
+{
+  "intrnRefId" : "72.202452-372",
+  "channel" : "01",
+  "amount" : 35000030,
+  "dbtrIdType" : "01",    
+  "dbtrId"  : "KTP-2004050",
+  "dbtrAccountNo" : "11112274",
+  "dbtrAccountType" : "CACC",
+  "recptBank" : "FASTIDJA",
+  "crdtIdType" : "02",
+  "crdtId" : "PT-A403",
+  "crdtAccountNo" : "93552269",
+  "crdtAccountType" : "SVGS",
+  "paymentInfo" : "Ini account inactive"
+}
+
+###
+
+# Reverse Credit Transfer Request from channel on generic endpoint
+POST http://localhost:9002/services/komi/outbound HTTP/1.1
+Content-Type: application/json
+
+{
+  "ReverseCreditTransferRequest" : {
+    "intrnRefId" : "72.202452-372",
+    "channel" : "01",
+    "amount" : 35000030,
+    "dbtrIdType" : "01",    
+    "dbtrId"  : "KTP-2004050",
+    "dbtrAccountNo" : "11112274",
+    "dbtrAccountType" : "CACC",
+    "recptBank" : "FASTIDJA",
+    "crdtIdType" : "02",
+    "crdtId" : "PT-A403",
+    "crdtAccountNo" : "93552269",
+    "crdtAccountType" : "SVGS",
+    "paymentInfo" : "Ini account inactive"
+  }
+}

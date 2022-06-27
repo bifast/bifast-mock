@@ -1,0 +1,54 @@
+POST http://localhost:9006/mock/cihub HTTP/1.1
+Content-Type: application/json
+Authorization: Basic CMS:password
+
+{
+  "BusMsg": {
+    "AppHdr": {
+      "Fr": {
+        "Fiid": {
+          "FinInstnId": {
+            "Othr": {
+              "Id": "SIHBIDJ1"
+            }
+          }
+        }
+      },
+      "To": {
+        "Fiid": {
+          "FinInstnId": {
+            "Othr": {
+              "Id": "INDOIDJA"
+            }
+          }
+        }
+      },
+      "BizMsgIdr": "20211116SIHBIDJ1610O0100000369",
+      "MsgDefIdr": "prxy.005.001.01",
+      "CreDt": "2021-11-16T06:11:57Z"
+    },
+    "Document": {
+      "PrxyNqryReq": {
+        "GrpHdr": {
+          "MsgId": "20211116SIHBIDJ161000000369",
+          "CreDtTm": "2021-11-16T13:11:57.572",
+          "MsgSndr": {
+            "Agt": {
+              "FinInstnId": {
+                "Othr": {
+                  "Id": "SIHBIDJ1"
+                }
+              }
+            }
+          }
+        },
+        "Nqry": {
+          "ScndId": {
+            "Tp": "01",
+            "Val": "K162042"
+          }
+        }
+      }
+    }
+  }
+}

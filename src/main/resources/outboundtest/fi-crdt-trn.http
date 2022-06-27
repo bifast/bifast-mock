@@ -1,0 +1,20 @@
+# FI Credit Transfer Request from channel on generic endpoint
+
+# orignRefId 9.. akan reject by CB
+# recpt 031 akan timeout response
+# recpt selain itu (213,008,014) tidak timeout
+
+POST http://localhost:9002/komi-outbound/service HTTP/1.1
+Content-Type: application/json
+
+{
+  "FICreditTransferRequest" : {
+    "intrnRefId" : "6011",
+    "channel" : "Over the Counter",
+    "amount" : 711660,
+    "recptBank" : "008",
+    "creditorBank" : "014",
+    "debtorBank" : "213",
+    "paymentInfo" : "Untuk jalan jalan"
+  }
+}

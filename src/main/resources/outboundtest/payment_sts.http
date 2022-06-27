@@ -1,0 +1,62 @@
+# Payment Status Request from channel on generic endpoint
+POST http://localhost:9002/komi-outbound/service HTTP/1.1
+Content-Type: application/json
+
+{
+    "PaymentStatusRequest" : {
+      "channelRefId": "24156",
+      "channel" : "Internet Banking",
+      "endToEndId" : "20210922SIHBIDJ1010O0100000100",
+      "msgType" : "Credit Transfer",
+	    "recptBank" : "FASTIDJA"
+    }
+}
+
+###
+POST http://localhost:9006/mock/cihub HTTP/1.1
+Content-Type: application/json
+
+{"BusMsg":{"AppHdr":{"Fr":{"Fiid":{"FinInstnId":{"Othr":{"Id":"SIHBIDJ1"}}}},"To":{"Fiid":{"FinInstnId":{"Othr":{"Id":"FASTIDJA"}}}},"BizMsgIdr":"20210924SIHBIDJ1000O9900000056","MsgDefIdr":"pacs.028.001.04","CreDt":"2021-09-24T15:11:58"},"Document":{"FitoFIPmtStsReq":{"GrpHdr":{"MsgId":"20210924SIHBIDJ100000000057","CreDtTm":1632471118876},"TxInf":[{"OrgnlEndToEndId":"20210922SIHBIDJ1010O0000010100"}]}}}}
+
+###
+
+{
+  "BusMsg": {
+    "AppHdr": {
+      "Fr": {
+        "Fiid": {
+          "FinInstnId": {
+            "Othr": {
+              "Id": "MNDRIDJA"
+            }
+          }
+        }
+      },
+      "To": {
+        "Fiid": {
+          "FinInstnId": {
+            "Othr": {
+              "Id": "INDOIDJA"
+            }
+          }
+        }
+      },
+      "BizMsgIdr": "20210912MNDRIDJA000O9900000101",
+      "MsgDefIdr": "pacs.028.001.04",
+      "CreDt": "2021-09-12T21:17:27"
+    },
+    "Document": {
+      "FitoFIPmtStsReq": {
+        "GrpHdr": {
+          "MsgId": "20210912MNDRIDJA00000000102",
+          "CreDtTm": 1631456247604
+        },
+        "TxInf": [
+          {
+            "OrgnlEndToEndId": "20210912MNDRIDJA010O0100000099"
+          }
+        ]
+      }
+    }
+  }
+}

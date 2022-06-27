@@ -1,0 +1,40 @@
+# 
+POST http://localhost:9006/mock/inbound HTTP/1.1
+Content-Type: application/json
+
+{
+    "PaymentRequest": {
+        "amount": "21000",
+        "debtorName": "Abang",
+        "debtorAccountNo": "22333451",
+        "creditorAccountNo": "24005006",
+        "paymentInfo": "satu info"
+    }
+}
+
+### 
+
+POST http://localhost:9006/mock/inbound HTTP/1.1
+Content-Type: application/json
+
+{
+    "AccountEnquiryRequest": {
+        "amount": "21000",
+        "creditorAccountNo": "24005006",
+        "paymentInfo": "satu info"
+    }
+}
+
+### 
+
+POST http://localhost:9006/mock/inbound HTTP/1.1
+Content-Type: application/json
+
+{
+    "CreditTransferRequest": {
+        "amount": "21000",
+        "debtorName": "JOKO",
+        "creditorAccountNo": "24005006",
+        "paymentInfo": "satu info"
+    }
+}

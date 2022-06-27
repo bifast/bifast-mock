@@ -1,0 +1,33 @@
+# direct ke mock, test timeout
+POST http://localhost:9006/mock/cihub HTTP/1.1
+Content-Type: application/json
+Authorization: Basic user:passwords
+
+{"BusMsg":{"AppHdr":{"Fr":{"FIId":{"FinInstnId":{"Othr":{"Id":"SIHBIDJ1"}}}},"To":{"FIId":{"FinInstnId":{"Othr":{"Id":"CITYIDJA"}}}},"BizMsgIdr":"20211129SIHBIDJ1510O0100000479","MsgDefIdr":"pacs.008.001.08","CreDt":"2021-11-29T04:03:47Z"},"Document":{"FIToFICstmrCdtTrf":{"GrpHdr":{"MsgId":"20211129SIHBIDJ151000000479","CreDtTm":"2021-11-29T11:03:47.229","NbOfTxs":"1","SttlmInf":{"SttlmMtd":"CLRG"}},"CdtTrfTxInf":[{"PmtId":{"EndToEndId":"20211129SIHBIDJ1510O0100000479","TxId":"20211129SIHBIDJ151000000479"},"PmtTpInf":{"CtgyPurp":{"Prtry":"51001"}},"IntrBkSttlmAmt":{"Value":"24520064.00","Ccy":"IDR"},"ChrgBr":"DEBT","Dbtr":{},"DbtrAgt":{"FinInstnId":{"Othr":{"Id":"SIHBIDJ1"}}},"CdtrAgt":{"FinInstnId":{"Othr":{"Id":"CITYIDJA"}}},"Cdtr":{},"CdtrAcct":{"Id":{"Othr":{"Id":"3175771839"}}}}]}}}}
+###
+# direct ke mock, not timeout
+POST http://localhost:9006/mock/cihub HTTP/1.1
+Content-Type: application/json
+
+{"BusMsg":{"AppHdr":{"Fr":{"Fiid":{"FinInstnId":{"Othr":{"Id":"SIHBIDJ1"}}}},"To":{"Fiid":{"FinInstnId":{"Othr":{"Id":"CENAIDJA"}}}},"BizMsgIdr":"20211003SIHBIDJ1510O0100000001","MsgDefIdr":"pacs.008.001.08","CreDt":"2021-10-03T05:33:41"},"Document":{"FitoFICstmrCdtTrf":{"GrpHdr":{"MsgId":"20211003SIHBIDJ151000054773","CreDtTm":"2021-10-03T05:33:41","NbOfTxs":"1","SttlmInf":{"SttlmMtd":"CLRG"}},"CdtTrfTxInf":[{"PmtId":{"EndToEndId":"20211003SIHBIDJ1510O0100000001","TxId":"20211003SIHBIDJ151000054773"},"IntrBkSttlmAmt":{"Value":"137400.00","Ccy":"IDR"},"ChrgBr":"DEBT","Dbtr":{},"DbtrAgt":{"FinInstnId":{"Othr":{"Id":"SIHBIDJ1"}}},"CdtrAgt":{"FinInstnId":{"Othr":{"Id":"CENAIDJA"}}},"Cdtr":{},"CdtrAcct":{"Id":{"Othr":{"Id":"677589"}}}}]}}}}
+
+###
+# direct ke mock, reject response untuk norek 99xx
+POST http://localhost:9006/mock/cihub HTTP/1.1
+Content-Type: application/json
+Authorization: Basic user:password
+
+<<<<<<< HEAD
+{
+  "AccountEnquiryRequest" : {
+    "channelRefId" : "40118",
+    "channel" : "01",
+    "recptBank" : "BMRIIDJA",
+    "amount" : 1545500,
+    "categoryPurpose" : "01",
+    "creditorAccountNumber" : "1814449"
+  }
+}
+=======
+{"BusMsg":{"AppHdr":{"Fr":{"Fiid":{"FinInstnId":{"Othr":{"Id":"SIHBIDJ1"}}}},"To":{"Fiid":{"FinInstnId":{"Othr":{"Id":"CENAIDJA"}}}},"BizMsgIdr":"20211003SIHBIDJ1510O0100000001","MsgDefIdr":"pacs.008.001.08","CreDt":"2021-10-03T05:33:41"},"Document":{"FitoFICstmrCdtTrf":{"GrpHdr":{"MsgId":"20211003SIHBIDJ151000054773","CreDtTm":"2021-10-03T05:33:41","NbOfTxs":"1","SttlmInf":{"SttlmMtd":"CLRG"}},"CdtTrfTxInf":[{"PmtId":{"EndToEndId":"20211003SIHBIDJ1510O0100000001","TxId":"20211003SIHBIDJ151000054773"},"IntrBkSttlmAmt":{"Value":"137400.00","Ccy":"IDR"},"ChrgBr":"DEBT","Dbtr":{},"DbtrAgt":{"FinInstnId":{"Othr":{"Id":"SIHBIDJ1"}}},"CdtrAgt":{"FinInstnId":{"Othr":{"Id":"CENAIDJA"}}},"Cdtr":{},"CdtrAcct":{"Id":{"Othr":{"Id":"997589"}}}}]}}}}
+>>>>>>> master

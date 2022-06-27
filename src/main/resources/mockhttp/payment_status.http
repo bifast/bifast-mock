@@ -1,0 +1,9 @@
+POST http://localhost:9006/mock/cihub HTTP/1.1
+Content-Type: application/json
+
+{"BusMsg":{"AppHdr":{"Fr":{"Fiid":{"FinInstnId":{"Othr":{"Id":"SIHBIDJ1"}}}},"To":{"Fiid":{"FinInstnId":{"Othr":{"Id":"INDOIDJA"}}}},"BizMsgIdr":"20211111SIHBIDJ1710O0100000279","MsgDefIdr":"prxy.001.001.01","CreDt":"2021-11-11T11:00:14Z"},"Document":{"PrxyRegn":{"GrpHdr":{"MsgId":"20211111SIHBIDJ171000000279","CreDtTm":"2021-11-11T18:00:14.229","MsgSndr":{"Agt":{"FinInstnId":{"Othr":{"Id":"SIHBIDJ1"}}},"Acct":{"Id":{"Othr":{}}}}},"Regn":{"RegnTp":"SUSP","Prxy":{"Tp":"02","Val":"AndreSutanto@gmail.com"},"PrxyRegn":{"Agt":{"FinInstnId":{"Othr":{}}},"Acct":{"Id":{"Othr":{}}},"ScndId":{"Tp":"01","Val":"KTP-222044020011"}}}}}}}
+
+###
+
+
+{"BusMsg":{"AppHdr":{"Fr":{"Fiid":{"FinInstnId":{"Othr":{"Id":"SIHBIDJ1"}}}},"To":{"Fiid":{"FinInstnId":{"Othr":{"Id":"BMNDIDJA"}}}},"BizMsgIdr":"20211031SIHBIDJ1010O0130400054","MsgDefIdr":"pacs.008.001.08","CreDt":"2021-10-31T09:41:39"},"Document":{"FitoFIPmtStsReq":{"GrpHdr":{"MsgId":"20211031SIHBIDJ101030300405","CreDtTm":1635648099683},"TxInf":[{"OrgnlEndToEndId":"20211030SIHBIDJ1010O0130300407"}]}}}}

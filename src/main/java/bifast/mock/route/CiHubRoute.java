@@ -2,8 +2,11 @@ package bifast.mock.route;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.ExchangePattern;
+import org.apache.camel.LoggingLevel;
+import org.apache.camel.Processor;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.jackson.JacksonDataFormat;
+import org.apache.camel.model.rest.RestBindingMode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -52,17 +55,28 @@ public class CiHubRoute extends RouteBuilder {
 		configureJson();
 		
 		onException(IOException.class)
-			.log("Client close connection")
+			.log(LoggingLevel.ERROR, "onException")
+			.process(new Processor() {
+				public void process(Exchange exchange) throws Exception {
+		            Throwable caused = exchange.getProperty(Exchange.EXCEPTION_CAUGHT, Throwable.class);
+					System.out.println(caused.getMessage());
+				}
+			})
+			.log("${exchangeProperty.Exchange.EXCEPTION_CAUGHT}")
 			.handled(true)
 		;
 		
 		restConfiguration()
 			.component("servlet")
+			.bindingMode(RestBindingMode.json)
+//		    .dataFormatProperty("prettyPrint", "true")
 		;
 		
 		rest("/")
 			.post("/cihub")
 				.consumes("application/json")
+//				.produces("application/json")
+				.outType(BusinessMessage.class)
 				.to("direct:receive")
 			.post("/cihub-proxy-regitrastion")
 				.consumes("application/json")
@@ -154,8 +168,9 @@ public class CiHubRoute extends RouteBuilder {
 			
 			.end()
 
-			.marshal(jsonBusinessMessageDataFormat)  // remark bila rejection
-
+//			.marshal(jsonBusinessMessageDataFormat)  // remark bila rejection
+//			.convertBodyTo(String.class)
+			
 			// .process(proxyResolutionResponseProcessor)
 			.log("Response mock: ${body}")
 			.removeHeaders("*")

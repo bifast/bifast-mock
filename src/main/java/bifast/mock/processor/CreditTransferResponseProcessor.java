@@ -10,6 +10,8 @@ import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -43,6 +45,8 @@ public class CreditTransferResponseProcessor implements Processor{
 	@Value("${komi.timeout-ct}")
 	private int delay;
 
+    private static Logger logger = LoggerFactory.getLogger(CreditTransferResponseProcessor.class);
+
 	@Override
 	public void process(Exchange exchange) throws Exception {
 		
@@ -54,8 +58,6 @@ public class CreditTransferResponseProcessor implements Processor{
     	map4ctreq.setSerializationInclusion(Include.NON_NULL);
     	String strCTReq = map4ctreq.writeValueAsString(objRequest);
 
-		System.out.println(strCTReq);
-    	
     	String addInfo = "";
 		if (null != objRequest.getDocument().getFiToFICstmrCdtTrf().getCdtTrfTxInf().get(0).getRmtInf()) 
 			addInfo = objRequest.getDocument().getFiToFICstmrCdtTrf().getCdtTrfTxInf().get(0).getRmtInf().getUstrd().get(0).toLowerCase();
@@ -64,7 +66,7 @@ public class CreditTransferResponseProcessor implements Processor{
 		String bank = objRequest.getDocument().getFiToFICstmrCdtTrf().getCdtTrfTxInf().get(0).getCdtrAgt().getFinInstnId().getOthr().getId();
 		exchange.getMessage().setHeader("hdr_account_no", norekCdtr);
 	
-		if (norekCdtr.startsWith("99")) {
+		if (addInfo.contains("admi002")) {
 			String str = admi002();
 	    	ObjectMapper map = new ObjectMapper();
 	    	map.registerModule(new JaxbAnnotationModule());
@@ -80,15 +82,14 @@ public class CreditTransferResponseProcessor implements Processor{
 			BusinessMessage resultMessg = buildBusinessMessage (objRequest, oAcct);
 			saveCreditResponse(objRequest, resultMessg, strCTReq);
 	
-			if ((addInfo.equals("timeout")) || (addInfo.contains("cttimeout"))) {
+			if ((addInfo.contains("timeout")) || (addInfo.contains("cttimeout"))) {
 			    try
 			    {
-			    	System.out.println("delay dulu selama " + delay);
+			    	logger.info("delay dulu selama " + delay);
 			    	LocalDateTime dt1 = LocalDateTime.now();
 			        Thread.sleep(delay);
 			        Long duration = Duration.between(LocalDateTime.now(), dt1).getSeconds();
-			        System.out.println("Oke : " + duration);
-			        resultMessg.getDocument().getFiToFIPmtStsRpt().getTxInfAndSts().get(0).getStsRsnInf().get(0).getRsn().setPrtry("U900");
+			        logger.info("Oke : " + duration);
 			    }
 			    catch(InterruptedException ex)
 			    {
@@ -175,45 +176,6 @@ public class CreditTransferResponseProcessor implements Processor{
 		return busMesg;
 	}
 	
-//	BusinessMessage buildTimeoutResponse (BusinessMessage bmInput) throws Exception {
-//		
-//		String bizMsgId = utilService.genRfiBusMsgId("010", "02", bmInput.getAppHdr().getTo().getFIId().getFinInstnId().getOthr().getId());
-//		String msgId = utilService.genMessageId("010", bmInput.getAppHdr().getTo().getFIId().getFinInstnId().getOthr().getId());
-//
-//		Pacs002Seed seed = new Pacs002Seed();
-//		seed.setMsgId(msgId);
-//
-//		seed.setStatus("RJCT");
-//		seed.setReason("U900");
-//		seed.setCreditorName(bmInput.getDocument().getFiToFICstmrCdtTrf().getCdtTrfTxInf().get(0).getCdtr().getNm());
-//		
-//		seed.setCreditorType("01");
-//		seed.setCreditorId(bmInput.getDocument().getFiToFICstmrCdtTrf().getCdtTrfTxInf().get(0).getCdtr().getId().getPrvtId().getOthr().get(0).getId());
-//		seed.setCreditorResidentialStatus("01");
-//		seed.setCreditorTown(bmInput.getDocument().getFiToFICstmrCdtTrf().getCdtTrfTxInf().get(0).getSplmtryData().get(0).getEnvlp().getDtl().getCdtr().getTwnNm());
-//
-//		FIToFIPaymentStatusReportV10 response = pacs002Service.creditTransferRequestResponse(seed, bmInput);
-//		
-//		GregorianCalendar gcal = new GregorianCalendar();
-//		XMLGregorianCalendar xcal = DatatypeFactory.newInstance().newXMLGregorianCalendar(gcal);
-//		response.getTxInfAndSts().get(0).getOrgnlTxRef().setIntrBkSttlmDt(xcal);
-//
-//		BusinessApplicationHeaderV01 hdr = new BusinessApplicationHeaderV01();
-//		hdr = hdrService.getAppHdr(bmInput.getAppHdr().getFr().getFIId().getFinInstnId().getOthr().getId(), 
-//									"pacs.002.001.10", bizMsgId);
-//		hdr.setBizSvc("CLEAR");
-//		hdr.getFr().getFIId().getFinInstnId().getOthr().setId(bmInput.getAppHdr().getTo().getFIId().getFinInstnId().getOthr().getId());
-//
-//		BusinessMessage busMesg = new BusinessMessage();
-//		Document doc = new Document();
-//		doc.setFiToFIPmtStsRpt(response);
-//
-//		busMesg.setAppHdr(hdr);
-//		busMesg.setDocument(doc);
-//
-//		return busMesg;
-//	}
-
     public void saveCreditResponse (BusinessMessage requestMsg, BusinessMessage responseMsg, String strCTReq) throws Exception {
 
     	ObjectMapper map = new ObjectMapper();

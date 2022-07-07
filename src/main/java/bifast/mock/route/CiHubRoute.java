@@ -68,15 +68,15 @@ public class CiHubRoute extends RouteBuilder {
 		
 		restConfiguration()
 			.component("servlet")
-			.bindingMode(RestBindingMode.json)
-//		    .dataFormatProperty("prettyPrint", "true")
+//			.bindingMode(RestBindingMode.json)
+		    .dataFormatProperty("prettyPrint", "true")
 		;
 		
 		rest("/")
 			.post("/cihub")
 				.consumes("application/json")
 //				.produces("application/json")
-				.outType(BusinessMessage.class)
+//				.outType(BusinessMessage.class)
 				.to("direct:receive")
 			.post("/cihub-proxy-regitrastion")
 				.consumes("application/json")
@@ -168,8 +168,8 @@ public class CiHubRoute extends RouteBuilder {
 			
 			.end()
 
-//			.marshal(jsonBusinessMessageDataFormat)  // remark bila rejection
-//			.convertBodyTo(String.class)
+			.marshal(jsonBusinessMessageDataFormat)  // remark bila rejection
+			.convertBodyTo(String.class)
 			
 			// .process(proxyResolutionResponseProcessor)
 			.log("Response mock: ${body}")

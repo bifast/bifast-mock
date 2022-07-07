@@ -103,7 +103,7 @@ public class IsoAdapterRoute extends RouteBuilder {
 				.to("direct:settlement")
 		;
 
-		from("direct:cif").routeId("cif")
+		from("direct:cif").routeId("cb.cif")
 			.convertBodyTo(String.class)
 			.log("CustInfo request: ${body}")
 			.unmarshal(cifRequestJDF)
@@ -111,7 +111,7 @@ public class IsoAdapterRoute extends RouteBuilder {
 			.marshal(cifResponseJDF)
 			;
 
-		from("direct:accountenquiry").routeId("accountenquiry")
+		from("direct:accountenquiry").routeId("cb.accountenquiry")
 			.convertBodyTo(String.class)
 			.log("AccountEnquiry: ${body}")
 			.unmarshal(aeRequestJDF)
@@ -119,7 +119,7 @@ public class IsoAdapterRoute extends RouteBuilder {
 			.marshal(aeResponseJDF)
 			;
 		
-		from("direct:debit").routeId("debit")
+		from("direct:debit").routeId("cb.debit")
 			.convertBodyTo(String.class)
 			.log("Debit request: ${body}")
 			.unmarshal(debitRequestJDF)
@@ -127,7 +127,7 @@ public class IsoAdapterRoute extends RouteBuilder {
 			.marshal(debitResponseJDF)
 			;
 
-		from("direct:debitreversal").routeId("debitreversal")
+		from("direct:debitreversal").routeId("cb.debitreversal")
 			.convertBodyTo(String.class)
 			.log("DebitReversal request: ${body}")
 			.unmarshal(debitRequestJDF)
@@ -135,15 +135,17 @@ public class IsoAdapterRoute extends RouteBuilder {
 			.marshal(debitResponseJDF)
 			;
 
-		from("direct:credit").routeId("credit")
+		from("direct:credit").routeId("cb.credit")
 			.convertBodyTo(String.class)
 			.log("Credit request: ${body}")
 			.unmarshal(creditRequestJDF)
 			.process(creditRequestPrc)
 			.marshal(creditResponseJDF)
+			.log("Credit response: ${body}")
+
 			;
 
-		from("direct:settlement").routeId("settlement2")
+		from("direct:settlement").routeId("cb.settlement")
 			.convertBodyTo(String.class)
 			.log("Settlement: ${body}")
 			.unmarshal(settlementRequestJDF)

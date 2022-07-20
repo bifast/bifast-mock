@@ -59,8 +59,6 @@ public class ProxyRoute extends RouteBuilder {
         from("direct:prxyregninquiry").routeId("proxyregistrationinquiry")
         
 	        .log("Terima di mock")
-	        .log("${body}")
-	        .log("Run Processor Inquiry")
 	        .process(proxyRegistrationInquiryProcessor)
 	        .log("End Process")
 	        

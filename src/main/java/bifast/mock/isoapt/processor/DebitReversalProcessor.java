@@ -6,18 +6,18 @@ import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.springframework.stereotype.Component;
 
-import bifast.mock.isoapt.pojo.CreditResponse;
-import bifast.mock.isoapt.pojo.DebitRequest;
+import bifast.mock.isoapt.pojo.DebitReversalRequestPojo;
+import bifast.mock.isoapt.pojo.DebitReversalResponsePojo;
 
 @Component
-public class DebitReversalRequestProcessor implements Processor {
+public class DebitReversalProcessor implements Processor {
 
 	@Override
 	public void process(Exchange exchange) throws Exception {
 
-		DebitRequest req = exchange.getMessage().getBody(DebitRequest.class);
+		DebitReversalRequestPojo req = exchange.getMessage().getBody(DebitReversalRequestPojo.class);
 		
-		CreditResponse resp = new CreditResponse();
+		DebitReversalResponsePojo resp = new DebitReversalResponsePojo();
 		
 		resp.setAccountNumber(req.getCreditorAccountNumber());
 		resp.setAdditionalInfo(req.getPaymentInformation());

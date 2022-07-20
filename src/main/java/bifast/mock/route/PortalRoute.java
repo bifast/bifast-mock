@@ -34,9 +34,9 @@ public class PortalRoute extends RouteBuilder {
 
 			.setExchangePattern(ExchangePattern.InOnly)
 			.convertBodyTo(String.class)
-//			.log("Terima di portal-api")
-//			.log("${body}")
-			.setBody(constant(null))
+			.log("Terima di portal-api")
+			.log("${body}")
+			.setBody(constant(""))
 			
 			.removeHeaders("*")
 		;

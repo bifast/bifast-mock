@@ -3,10 +3,10 @@ Content-Type: application/json
 
 {
     "PaymentRequest": {
-        "amount": "21000",
-        "debtorName": "Abang",
+        "amount": "26000",
+        "debtorName": "Anton P",
         "debtorAccountNo": "22333451",
-        "creditorAccountNo": "24005006",
-        "paymentInfo": "satu info"
+        "creditorAccountNo": "2012107552576",
+        "paymentInfo": ""
     }
 }

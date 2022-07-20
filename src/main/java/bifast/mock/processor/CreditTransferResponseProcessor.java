@@ -82,7 +82,7 @@ public class CreditTransferResponseProcessor implements Processor{
 			BusinessMessage resultMessg = buildBusinessMessage (objRequest, oAcct);
 			saveCreditResponse(objRequest, resultMessg, strCTReq);
 	
-			if ((addInfo.contains("timeout")) || (addInfo.contains("cttimeout"))) {
+			if (addInfo.contains("cttimeout")) {
 			    try
 			    {
 			    	logger.info("delay dulu selama " + delay);

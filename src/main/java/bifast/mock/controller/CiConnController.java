@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import bifast.library.iso20022.custom.BusinessMessage;
 
 @RestController
-@RequestMapping(value="/mock")
+@RequestMapping(value="/test")
 public class CiConnController {
 
 	@Autowired private ProducerTemplate template;

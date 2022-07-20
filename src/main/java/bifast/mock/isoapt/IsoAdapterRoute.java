@@ -15,12 +15,15 @@ import bifast.mock.isoapt.pojo.CreditRequest;
 import bifast.mock.isoapt.pojo.CreditResponse;
 import bifast.mock.isoapt.pojo.DebitRequest;
 import bifast.mock.isoapt.pojo.DebitResponse;
+import bifast.mock.isoapt.pojo.DebitReversalRequestPojo;
+import bifast.mock.isoapt.pojo.DebitReversalResponsePojo;
 import bifast.mock.isoapt.pojo.SettlementRequest;
 import bifast.mock.isoapt.pojo.SettlementResponse;
 import bifast.mock.isoapt.processor.AccountEnquiryProcessor;
 import bifast.mock.isoapt.processor.CIFProcessor;
 import bifast.mock.isoapt.processor.CreditRequestProcessor;
 import bifast.mock.isoapt.processor.DebitRequestProcessor;
+import bifast.mock.isoapt.processor.DebitReversalProcessor;
 
 
 @Component
@@ -28,6 +31,7 @@ public class IsoAdapterRoute extends RouteBuilder {
 	@Autowired private CIFProcessor cifPrc;
 	@Autowired private CreditRequestProcessor creditRequestPrc;
 	@Autowired private DebitRequestProcessor debitRequestPrc;
+	@Autowired private DebitReversalProcessor debitReversalRequestPrc;
 	@Autowired private AccountEnquiryProcessor accountEnquiryPrc;
 	@Autowired private SettlementRequestProcessor settlementRequestPrc;
 
@@ -37,6 +41,8 @@ public class IsoAdapterRoute extends RouteBuilder {
 	JacksonDataFormat cifResponseJDF = new JacksonDataFormat(CIFResponse.class);
 	JacksonDataFormat debitRequestJDF = new JacksonDataFormat(DebitRequest.class);
 	JacksonDataFormat debitResponseJDF = new JacksonDataFormat(DebitResponse.class);
+	JacksonDataFormat debitReversalRequestJDF = new JacksonDataFormat(DebitReversalRequestPojo.class);
+	JacksonDataFormat debitReversalResponseJDF = new JacksonDataFormat(DebitReversalResponsePojo.class);
 	JacksonDataFormat creditRequestJDF = new JacksonDataFormat(CreditRequest.class);
 	JacksonDataFormat creditResponseJDF = new JacksonDataFormat(CreditResponse.class);
 	JacksonDataFormat settlementRequestJDF = new JacksonDataFormat(SettlementRequest.class);
@@ -59,6 +65,13 @@ public class IsoAdapterRoute extends RouteBuilder {
 		debitResponseJDF.setInclude("NON_NULL");
 		debitResponseJDF.setInclude("NON_EMPTY");
 		
+		debitReversalRequestJDF.addModule(new JaxbAnnotationModule());  //supaya nama element pake annot JAXB (uppercasecamel)
+		debitReversalRequestJDF.setInclude("NON_NULL");
+		debitReversalRequestJDF.setInclude("NON_EMPTY");
+		debitReversalResponseJDF.addModule(new JaxbAnnotationModule());  //supaya nama element pake annot JAXB (uppercasecamel)
+		debitReversalResponseJDF.setInclude("NON_NULL");
+		debitReversalResponseJDF.setInclude("NON_EMPTY");
+
 		creditRequestJDF.addModule(new JaxbAnnotationModule());  //supaya nama element pake annot JAXB (uppercasecamel)
 		creditRequestJDF.setInclude("NON_NULL");
 		creditRequestJDF.setInclude("NON_EMPTY");
@@ -117,6 +130,7 @@ public class IsoAdapterRoute extends RouteBuilder {
 			.unmarshal(aeRequestJDF)
 			.process(accountEnquiryPrc)
 			.marshal(aeResponseJDF)
+			.log("AccountEnquiry response: ${body}")
 			;
 		
 		from("direct:debit").routeId("cb.debit")
@@ -125,14 +139,16 @@ public class IsoAdapterRoute extends RouteBuilder {
 			.unmarshal(debitRequestJDF)
 			.process(debitRequestPrc)
 			.marshal(debitResponseJDF)
+			.log("Debit response: ${body}")
 			;
 
 		from("direct:debitreversal").routeId("cb.debitreversal")
 			.convertBodyTo(String.class)
 			.log("DebitReversal request: ${body}")
-			.unmarshal(debitRequestJDF)
-			.process(debitRequestPrc)
-			.marshal(debitResponseJDF)
+			.unmarshal(debitReversalRequestJDF)
+			.process(debitReversalRequestPrc)
+			.marshal(debitReversalResponseJDF)
+			.log("DebitReversal response: ${body}")
 			;
 
 		from("direct:credit").routeId("cb.credit")

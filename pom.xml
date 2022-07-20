@@ -12,7 +12,7 @@
 
 	<groupId>komi</groupId>
 	<artifactId>komi-mock</artifactId>
-	<version>2.6-SNAPSHOT</version>
+	<version>2.7-SNAPSHOT</version>
 	<name>komi-mock</name>
 	<description>BI FAST Mock</description>
 	<packaging>jar</packaging>

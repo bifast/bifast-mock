@@ -5,6 +5,8 @@ import java.util.List;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -33,11 +35,13 @@ public class ProxyRegistrationInquiryProcessor implements Processor{
 	@Autowired
 	AccountProxyRepository accountProxyRepository;
 
+	private static Logger logger = LoggerFactory.getLogger(ProxyRegistrationInquiryProcessor.class);
+
 	@Override
 	public void process(Exchange exchange) throws Exception {
 		
 		String bizMsgId = utilService.genRfiBusMsgId("610", "01", "INDOIDJA");
-		String ap = utilService.genMessageId("610", "INDOIDJA");
+//		String ap = utilService.genMessageId("610", "INDOIDJA");
 		
 		Proxy006Seed seed = new Proxy006Seed();
 		
@@ -54,7 +58,7 @@ public class ProxyRegistrationInquiryProcessor implements Processor{
 		
 		accountProxylist = accountProxyRepository.getListByScndIdTpAndByScndIdVal(scndIdTp,scndIdVal);
 		
-		System.out.println("Hasil enquiry ada " + accountProxylist.size() + " proxy.");
+		logger.debug("Hasil enquiry ada " + accountProxylist.size() + " proxy");
 		if(accountProxylist.size() > 0) {
 
 			List<Proxy006SeedAccount> proxy006SeedAccountList = new ArrayList<Proxy006SeedAccount>();

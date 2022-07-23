@@ -32,6 +32,11 @@ public class CreditRequestProcessor implements Processor {
 			resp.setReason("U900");
 			resp.setStatus("RJCT");			
 		}
+		else if (pymtInfo.contains("creditreject")) {
+			resp.setReason("U149");
+			resp.setStatus("RJCT");			
+		}
+
 		else {
 			resp.setReason("U000");
 			resp.setStatus("ACTC");

@@ -1,0 +1,4 @@
+POST http://10.11.103.65:9001/komi-inbound/json/service HTTP/1.1
+Content-Type: application/json
+
+{"BusMsg":{"AppHdr":{"Fr":{"FIId":{"FinInstnId":{"Othr":{"Id":"FASTIDJA"}}}},"To":{"FIId":{"FinInstnId":{"Othr":{"Id":"SIHBIDJ1"}}}},"BizMsgIdr":"20220723FASTIDJA000H9920885863","MsgDefIdr":"pacs.002.001.10","BizSvc":"STTL","CreDt":"2022-07-23T07:57:16Z"},"Document":{"FIToFIPmtStsRpt":{"GrpHdr":{"MsgId":"20220723SIHBIDJ10101100002512","CreDtTm":"2022-07-23T14:55:26.744"},"OrgnlGrpInfAndSts":[{"OrgnlMsgId":"20220723SIHBIDJ100053726481","OrgnlMsgNmId":"pacs.028.001.04"}],"TxInfAndSts":[{"OrgnlEndToEndId":"20220723CENAIDJA010O0289723003","OrgnlTxId":"20220723CENAIDJA0101100002454","TxSts":"ACSC","StsRsnInf":[{"Rsn":{"Prtry":"U000"}}],"ClrSysRef":"003","OrgnlTxRef":{"IntrBkSttlmDt":"2022-07-23","Cdtr":{"Pty":{"Nm":"JUFRI ALAM SARAGIH"}}}}]}}}}

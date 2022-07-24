@@ -16,7 +16,6 @@ import bifast.mock.isoservice.Pacs008MessageService;
 import bifast.mock.isoservice.Pacs008Seed;
 import bifast.mock.processor.UtilService;
 
-
 @Component
 public class BuildAERequestProcessor implements Processor {
 	@Autowired private MsgHeaderService appHeaderService;
@@ -58,5 +57,4 @@ public class BuildAERequestProcessor implements Processor {
 	
 		exchange.getIn().setBody(busMsg);
 	}
-
 }

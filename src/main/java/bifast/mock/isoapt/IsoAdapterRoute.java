@@ -126,11 +126,11 @@ public class IsoAdapterRoute extends RouteBuilder {
 
 		from("direct:accountenquiry").routeId("cb.accountenquiry")
 			.convertBodyTo(String.class)
-			.log("AccountEnquiry: ${body}")
+			.log("Account Enquiry: ${body}")
 			.unmarshal(aeRequestJDF)
 			.process(accountEnquiryPrc)
 			.marshal(aeResponseJDF)
-			.log("AccountEnquiry response: ${body}")
+			.log("Account Enquiry response: ${body}")
 			;
 		
 		from("direct:debit").routeId("cb.debit")

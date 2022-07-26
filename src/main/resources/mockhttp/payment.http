@@ -1,4 +1,4 @@
-POST http://localhost:9006/mock/inbound HTTP/1.1
+POST http://10.11.103.65:9006/mock/inbound HTTP/1.1
 Content-Type: application/json
 
 {

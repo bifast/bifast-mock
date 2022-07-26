@@ -2,6 +2,8 @@ package bifast.mock.proxy;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -22,9 +24,13 @@ public class ProxyRegistrationProcessor implements Processor{
 	@Autowired private ProxyRegistrationService proxyRegService;
 	@Autowired private UtilService utilService;
 
+	private static Logger logger = LoggerFactory.getLogger(ProxyRegistrationProcessor.class);
+
 	@Override
 	public void process(Exchange exchange) throws Exception {
 		
+		logger.debug("Siapkan registrasi");
+
 		String bizMsgId = utilService.genRfiBusMsgId("710", "01", "INDOIDJA");
 		String msgId = utilService.genMessageId("710", "INDOIDJA");
 
@@ -78,6 +84,7 @@ public class ProxyRegistrationProcessor implements Processor{
 		busMesg.setDocument(doc);
 
 		exchange.getMessage().setBody(busMesg);
+		
 	}
 	
 }

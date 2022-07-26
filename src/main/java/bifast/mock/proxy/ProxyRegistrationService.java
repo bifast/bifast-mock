@@ -3,6 +3,8 @@ package bifast.mock.proxy;
 import java.util.Optional;
 import java.util.Random;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,9 +20,12 @@ public class ProxyRegistrationService {
 	@Autowired AccountProxyRepository proxyRepo;
 	@Autowired UtilService utilService;
 	
+	private static Logger logger = LoggerFactory.getLogger(ProxyRegistrationService.class);
 
 	public Proxy002Seed newr (BusinessMessage bm) {
 		Proxy002Seed seed = new Proxy002Seed();
+
+		logger.debug("di ProxyRegistrationService");
 
 		ProxyRegistrationV01 prxyRegn = bm.getDocument().getPrxyRegn();
 		String proxyType = prxyRegn.getRegn().getPrxy().getTp();
@@ -30,7 +35,9 @@ public class ProxyRegistrationService {
 		seed.setMsgRcptAgtId(prxyRegn.getGrpHdr().getMsgSndr().getAgt().getFinInstnId().getOthr().getId());
 		seed.setAgtId(prxyRegn.getRegn().getPrxyRegn().getAgt().getFinInstnId().getOthr().getId());
 
+
 		if ((oAccountProxy.isEmpty()) ) {
+			logger.debug("oAccountProxy.isEmpty");
 				 
 			Random rand = new Random();
 			long random = (long)(rand.nextDouble()*10000000000L);
@@ -65,6 +72,8 @@ public class ProxyRegistrationService {
 		}
 
 		else {
+			logger.debug("oAccountProxy.isNOTEmpty");
+
 			seed.setStatus("RJCT");
 			seed.setReason("U808");
 		}

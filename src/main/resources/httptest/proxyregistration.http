@@ -1,0 +1,107 @@
+POST http://localhost:9006/mock/cihub HTTP/1.1
+Content-Type: application/json
+
+{
+    "BusMsg": {
+        "AppHdr": {
+            "Fr": {
+                "FIId": {
+                    "FinInstnId": {
+                        "Othr": {
+                            "Id": "SIHBIDJ1"
+                        }
+                    }
+                }
+            },
+            "To": {
+                "FIId": {
+                    "FinInstnId": {
+                        "Othr": {
+                            "Id": "FASTIDJA"
+                        }
+                    }
+                }
+            },
+            "BizMsgIdr": "20220726SIHBIDJ1710O0155572007",
+            "MsgDefIdr": "prxy.001.001.01",
+            "CreDt": "2022-07-26T08:26:12Z"
+        },
+        "Document": {
+            "PrxyRegn": {
+                "GrpHdr": {
+                    "MsgId": "20220726SIHBIDJ171055572007",
+                    "CreDtTm": "2022-07-26T15:26:12.566",
+                    "MsgSndr": {
+                        "Agt": {
+                            "FinInstnId": {
+                                "Othr": {
+                                    "Id": "SIHBIDJ1"
+                                }
+                            }
+                        },
+                        "Acct": {
+                            "Id": {
+                                "Othr": {
+                                    "Id": "112222334"
+                                }
+                            }
+                        }
+                    }
+                },
+                "Regn": {
+                    "RegnTp": "NEWR",
+                    "Prxy": {
+                        "Tp": "02",
+                        "Val": "bams13@gmail.com"
+                    },
+                    "PrxyRegn": {
+                        "DsplNm": "JOHN SMITH",
+                        "Agt": {
+                            "FinInstnId": {
+                                "Othr": {
+                                    "Id": "SIHBIDJ1"
+                                }
+                            }
+                        },
+                        "Acct": {
+                            "Id": {
+                                "Othr": {
+                                    "Id": "112222334"
+                                }
+                            },
+                            "Tp": {
+                                "Prtry": "CACC"
+                            },
+                            "Nm": "JOHN SMITH "
+                        },
+                        "ScndId": {
+                            "Tp": "01",
+                            "Val": "KTP-222044001"
+                        }
+                    }
+                },
+                "SplmtryData": [{
+                        "Envlp": {
+                            "Dtl": {
+                                "Cstmr": {
+                                    "Tp": "01",
+                                    "Id": "KTP-220440201",
+                                    "RsdntSts": "01",
+                                    "TwnNm": "0300"
+                                }
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+    }
+}
+
+
+###
+
+POST http://localhost:9006/mock/cihub HTTP/1.1
+Content-Type: application/json
+
+{"BusMsg":{"AppHdr":{"Fr":{"FIId":{"FinInstnId":{"Othr":{"Id":"SIHBIDJ1"}}}},"To":{"FIId":{"FinInstnId":{"Othr":{"Id":"FASTIDJA"}}}},"BizMsgIdr":"20220726SIHBIDJ1710O0352393011","MsgDefIdr":"prxy.001.001.01","CreDt":"2022-07-26T07:33:13Z"},"Document":{"PrxyRegn":{"GrpHdr":{"MsgId":"20220726SIHBIDJ171052393011","CreDtTm":"2022-07-26T14:33:13.844","MsgSndr":{"Agt":{"FinInstnId":{"Othr":{"Id":"SIHBIDJ1"}}},"Acct":{"Id":{"Othr":{"Id":"0012107555474"}}}}},"Regn":{"RegnTp":"NEWR","Prxy":{"Tp":"01","Val":"62895411734001"},"PrxyRegn":{"DsplNm":"PRAMESTI GITA","Agt":{"FinInstnId":{"Othr":{"Id":"SIHBIDJ1"}}},"Acct":{"Id":{"Othr":{"Id":"0012107555474"}},"Tp":{"Prtry":"SVGS"},"Nm":"PRAMESTI GITA"},"ScndId":{"Tp":"01","Val":"3175105107960001"}}},"SplmtryData":[{"Envlp":{"Dtl":{"Cstmr":{"Tp":"01","Id":"3175105107960001","RsdntSts":"01","TwnNm":"0392"}}}}]}}}}

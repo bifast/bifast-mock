@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.module.jaxb.JaxbAnnotationModule;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.jackson.JacksonDataFormat;
 import org.springframework.stereotype.Component;
@@ -31,17 +30,16 @@ public class ProxyRoute extends RouteBuilder {
 		jsonBusinessMessageDataFormat.setInclude("NON_EMPTY");
 	}
 	
+
     @Override
     public void configure() throws Exception {
 
     	configureJson();
 
         from("direct:prxyregn").routeId("proxyregistration")
-        	
             .log("Terima di mock Regis")
             .process(proxyRegistrationPrc)
             .log("End Process")
-            
         ;
         
         

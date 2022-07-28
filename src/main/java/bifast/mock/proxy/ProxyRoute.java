@@ -46,9 +46,6 @@ public class ProxyRoute extends RouteBuilder {
         from("direct:prxyreso").routeId("proxyresolution")
         
 	        .log("Terima di mock")
-	        .log("${body}")
-	        .delay(500)
-	        .log("end-delay")
 	        .process(proxyResolutionResponseProcessor)
 	        .log("End Process")
 	        

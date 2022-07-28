@@ -19,7 +19,7 @@ import bifast.library.iso20022.custom.BusinessMessage;
 import bifast.mock.processor.AccountEnquiryResponseProcessor;
 import bifast.mock.processor.CreditTransferResponseProcessor;
 import bifast.mock.processor.OnRequestProcessor;
-import bifast.mock.processor.PaymentStatusResponseProcessor;
+import bifast.mock.processor.PaymentStatusResponseProc;
 import bifast.mock.processor.RejectMessageProcessor;
 
 @Component
@@ -32,7 +32,7 @@ public class CiHubRoute extends RouteBuilder {
 	@Autowired
 	private CreditTransferResponseProcessor creditTransferResponseProcessor;
 	@Autowired
-	private PaymentStatusResponseProcessor paymentStatusResponseProcessor;
+	private PaymentStatusResponseProc paymentStatusResponseProcessor;
 	@Autowired
 	private RejectMessageProcessor rejectMessageProcessor;
 
@@ -124,10 +124,9 @@ public class CiHubRoute extends RouteBuilder {
 				.when().simple("${header.msgType} == 'CreditTransferRequest'")
 					.log("Akan process CT")
 					
-//					.delay(constant(30000))
-
 					.process(creditTransferResponseProcessor)
-
+					.to("seda:settlement?exchangePattern=InOnly")
+					
 					.setHeader("hdr_ctResponseObj",simple("${body}"))		
 					
 				.endChoice()

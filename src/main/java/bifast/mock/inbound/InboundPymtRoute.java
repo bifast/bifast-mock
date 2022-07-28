@@ -88,7 +88,6 @@ public class InboundPymtRoute extends RouteBuilder{
 					.log("kita sudahi sampai disini")
 					.process(new Processor() {
 						public void process(Exchange exchange) throws Exception {
-							BusinessMessage msg = exchange.getMessage().getBody(BusinessMessage.class);
 							BusinessMessage aeResp = exchange.getProperty("aeresponse", BusinessMessage.class);
 							String responseCode = exchange.getProperty("aerespCode", String.class);
 							String reasonCode = aeResp.getDocument().getFiToFIPmtStsRpt().getTxInfAndSts().get(0).getStsRsnInf().get(0).getRsn().getPrtry();

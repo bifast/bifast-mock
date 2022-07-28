@@ -3,43 +3,29 @@ package bifast.mock.processor;
 import java.text.DecimalFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 import java.util.Random;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.module.jaxb.JaxbAnnotationModule;
+
+import bifast.library.iso20022.custom.BusinessMessage;
 import bifast.mock.isoservice.Lib2Config;
-import bifast.mock.persist.MockNames;
-import bifast.mock.persist.MockNamesRepository;
 
 @Service
 public class UtilService {
 
 	@Autowired
 	private Lib2Config config;
-	@Autowired
-	private MockNamesRepository mockNamesRepo;
 
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
-
-//	public Integer getCounter () {
-//        Integer intNow = Integer.valueOf(LocalDateTime.now().format(formatter));
-//        
-//		Optional<InboundCounter> optCnt = inboundCounterRepo.findById(intNow); 
-//		if (optCnt.isPresent()) {
-//			InboundCounter msgCnt = optCnt.get();
-//			msgCnt.setLastNumber(msgCnt.getLastNumber()+1);
-//			inboundCounterRepo.save(msgCnt);
-//			return (msgCnt.getLastNumber());
-//		}
-//		else {
-//			InboundCounter msgCnt = new InboundCounter(intNow, 50000001);
-//			inboundCounterRepo.save(msgCnt);
-//			return (50000001);
-//		}
-//	}
 
 	public Integer getInboundCounter () {
 		
@@ -73,25 +59,23 @@ public class UtilService {
 		return msgId;
 	}
 
-	public String genBizMsgId (String oldId, String trxType) {
-		String newId = oldId.substring(22, 30);
-		String newDt = oldId.substring(0,8);
-		return newDt + config.getBankcode() + trxType + "R99" + newId;
+	public String serializeBusinessMessage (BusinessMessage bm) throws JsonProcessingException {
+		ObjectMapper map = new ObjectMapper();
+		map.registerModule(new JaxbAnnotationModule());
+		map.enable(SerializationFeature.WRAP_ROOT_VALUE);
+	    map.setSerializationInclusion(Include.NON_NULL);
+		String resp = map.writeValueAsString(bm);
+		return resp;
 	}
-	
-	public String getFullName () {
 
-		List<MockNames> names = mockNamesRepo.findAll();
-
-		Random rand = new Random();
-        int posbl1 = rand.nextInt(names.size());
-        int posbl2 = rand.nextInt(names.size());
-        if (posbl1 == posbl2)
-        	posbl2 = rand.nextInt(names.size());
-
-        String name = names.get(posbl1).getName() + " " + names.get(posbl2).getName();
-        return name;
-		
+	public BusinessMessage deserializeBusinessMessage (String str) throws JsonProcessingException {
+    	ObjectMapper map = new ObjectMapper();
+    	map.registerModule(new JaxbAnnotationModule());
+    	map.enable(DeserializationFeature.UNWRAP_ROOT_VALUE);
+    	map.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+    	BusinessMessage msg = map.readValue(str, BusinessMessage.class);
+    	return msg;
 	}
+
 
 }

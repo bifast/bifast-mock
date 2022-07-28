@@ -13,13 +13,13 @@ import com.fasterxml.jackson.module.jaxb.JaxbAnnotationModule;
 
 import bifast.library.iso20022.custom.BusinessMessage;
 import bifast.mock.processor.BuildReversal;
-import bifast.mock.processor.SettlementProcessor;
+import bifast.mock.processor.SettlementProc;
 
-@Component
+//@Component
 public class SettlementRoute extends RouteBuilder {
 	
 	@Autowired private BuildReversal buildReversal;
-	@Autowired private SettlementProcessor settlementProcessor;
+	@Autowired private SettlementProc settlementProcessor;
 	
 	JacksonDataFormat jsonBusinessMessageDataFormat = new JacksonDataFormat(BusinessMessage.class);
 

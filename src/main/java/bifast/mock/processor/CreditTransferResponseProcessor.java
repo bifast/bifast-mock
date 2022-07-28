@@ -16,12 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.module.jaxb.JaxbAnnotationModule;
-
 import bifast.library.iso20022.custom.BusinessMessage;
 import bifast.library.iso20022.custom.Document;
 import bifast.library.iso20022.head001.BusinessApplicationHeaderV01;
@@ -31,14 +25,14 @@ import bifast.mock.isoservice.Pacs002MessageService;
 import bifast.mock.isoservice.Pacs002Seed;
 import bifast.mock.persist.AccountProxy;
 import bifast.mock.persist.AccountProxyRepository;
-import bifast.mock.persist.MockPacs002;
-import bifast.mock.persist.MockPacs002Repository;
+import bifast.mock.persist.CTResponse;
+import bifast.mock.persist.CTResponseRepository;
 
 @Component
 public class CreditTransferResponseProcessor implements Processor{
 	@Autowired private AccountProxyRepository accountRepo;
+	@Autowired private CTResponseRepository CTRepo ;
 	@Autowired private MsgHeaderService hdrService;
-    @Autowired private MockPacs002Repository mockPacs002Repo;
 	@Autowired private Pacs002MessageService pacs002Service;
 	@Autowired private UtilService utilService;
 	
@@ -50,13 +44,11 @@ public class CreditTransferResponseProcessor implements Processor{
 	@Override
 	public void process(Exchange exchange) throws Exception {
 		
-		BusinessMessage objRequest = exchange.getMessage().getHeader("objRequest", BusinessMessage.class);		
-		
-    	ObjectMapper map4ctreq = new ObjectMapper();
-    	map4ctreq.registerModule(new JaxbAnnotationModule());
-    	map4ctreq.enable(SerializationFeature.WRAP_ROOT_VALUE);
-    	map4ctreq.setSerializationInclusion(Include.NON_NULL);
-    	String strCTReq = map4ctreq.writeValueAsString(objRequest);
+//		BusinessMessage objRequest = exchange.getMessage().getHeader("objRequest", BusinessMessage.class);	
+		BusinessMessage objRequest = exchange.getMessage().getBody(BusinessMessage.class);	
+
+		exchange.setProperty("ctRequest", objRequest);
+		exchange.setProperty("endtoendid", objRequest.getDocument().getFiToFICstmrCdtTrf().getCdtTrfTxInf().get(0).getPmtId().getEndToEndId());
 
     	String addInfo = "";
 		if (null != objRequest.getDocument().getFiToFICstmrCdtTrf().getCdtTrfTxInf().get(0).getRmtInf()) 
@@ -67,12 +59,7 @@ public class CreditTransferResponseProcessor implements Processor{
 		exchange.getMessage().setHeader("hdr_account_no", norekCdtr);
 	
 		if (addInfo.contains("admi002")) {
-			String str = admi002();
-	    	ObjectMapper map = new ObjectMapper();
-	    	map.registerModule(new JaxbAnnotationModule());
-	    	map.enable(DeserializationFeature.UNWRAP_ROOT_VALUE);
-	    	map.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-	    	BusinessMessage msg = map.readValue(str, BusinessMessage.class);
+	    	BusinessMessage msg = utilService.deserializeBusinessMessage(admi002());
 			exchange.getMessage().setBody(msg);
 		}
 
@@ -80,7 +67,7 @@ public class CreditTransferResponseProcessor implements Processor{
 
 			Optional<AccountProxy> oAcct = accountRepo.findByAccountNumberAndRegisterBank(norekCdtr, bank);
 			BusinessMessage resultMessg = buildBusinessMessage (objRequest, oAcct);
-			saveCreditResponse(objRequest, resultMessg, strCTReq);
+			saveCreditResponse(objRequest, resultMessg);
 	
 			if (addInfo.contains("cttimeout")) {
 			    try
@@ -100,7 +87,6 @@ public class CreditTransferResponseProcessor implements Processor{
 			exchange.getMessage().setBody(resultMessg);
 			
 		}
-		
 	}
 	
 	BusinessMessage buildBusinessMessage (BusinessMessage bmInput, Optional<AccountProxy> oAccount) throws Exception {
@@ -113,7 +99,7 @@ public class CreditTransferResponseProcessor implements Processor{
 
 		if (oAccount.isPresent()) {
 			AccountProxy account = oAccount.get();
-			System.out.println("account " + account + " exists " + account.getAccountStatus());
+			logger.info("account " + account + " exists " + account.getAccountStatus());
 			if (account.getAccountStatus().equals("ACTV")) {
 				seed.setStatus("ACTC");
 				seed.setReason("U000");				
@@ -176,35 +162,16 @@ public class CreditTransferResponseProcessor implements Processor{
 		return busMesg;
 	}
 	
-    public void saveCreditResponse (BusinessMessage requestMsg, BusinessMessage responseMsg, String strCTReq) throws Exception {
-
-    	ObjectMapper map = new ObjectMapper();
-    	map.registerModule(new JaxbAnnotationModule());
-    	map.enable(SerializationFeature.WRAP_ROOT_VALUE);
-	    map.setSerializationInclusion(Include.NON_NULL);
-
-    	String respAsString = map.writeValueAsString(responseMsg);
-    	System.out.println(respAsString);
-    	
-        // simpan sbg history
-		MockPacs002 pacs002 = new MockPacs002();
-		pacs002.setBizMsgIdr(responseMsg.getAppHdr().getBizMsgIdr());
-
-		pacs002.setFullMessage(respAsString);
-		pacs002.setCtRequest(strCTReq);
-        pacs002.setOrgnlEndToEndId(responseMsg.getDocument().getFiToFIPmtStsRpt().getTxInfAndSts().get(0).getOrgnlEndToEndId());
-		
-        pacs002.setOrgnlMsgId(responseMsg.getDocument().getFiToFIPmtStsRpt().getOrgnlGrpInfAndSts().get(0).getOrgnlMsgId());
-		
-        String orgnlMsgName = responseMsg.getDocument().getFiToFIPmtStsRpt().getOrgnlGrpInfAndSts().get(0).getOrgnlMsgNmId();
-        pacs002.setOrgnlMsgName(orgnlMsgName);
-        pacs002.setResult(responseMsg.getDocument().getFiToFIPmtStsRpt().getTxInfAndSts().get(0).getTxSts());
-        pacs002.setCdtrAcct(requestMsg.getDocument().getFiToFICstmrCdtTrf().getCdtTrfTxInf().get(0).getCdtrAcct().getId().getOthr().getId());
-        pacs002.setDbtrAcct(requestMsg.getDocument().getFiToFICstmrCdtTrf().getCdtTrfTxInf().get(0).getDbtrAcct().getId().getOthr().getId());
+    public void saveCreditResponse (BusinessMessage requestMsg, BusinessMessage responseMsg) throws Exception {
         
-        pacs002.setTrxType("CLEAR");
-
-        mockPacs002Repo.save(pacs002);
+        CTResponse ctResponse = new CTResponse();
+        ctResponse.setCdtrAcct(requestMsg.getDocument().getFiToFICstmrCdtTrf().getCdtTrfTxInf().get(0).getCdtrAcct().getId().getOthr().getId());
+        ctResponse.setEndToEndId(requestMsg.getDocument().getFiToFICstmrCdtTrf().getCdtTrfTxInf().get(0).getPmtId().getEndToEndId());
+        ctResponse.setJsonCtRequest(utilService.serializeBusinessMessage(requestMsg));
+//        ctResponse.setJsonCtResponse(utilService.serializeBusinessMessage(responseMsg));
+        ctResponse.setResponse(responseMsg.getDocument().getFiToFIPmtStsRpt().getTxInfAndSts().get(0).getTxSts());
+        ctResponse.setBizSvc("CLEAR");
+        CTRepo.save(ctResponse);
         
     }
     

@@ -1,17 +1,11 @@
 package bifast.mock.isoservice;
 
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
-import java.util.GregorianCalendar;
-import java.util.TimeZone;
 
 import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.XMLGregorianCalendar;
 
-//import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import bifast.library.iso20022.custom.BusinessMessage;
@@ -30,8 +24,8 @@ import bifast.library.iso20022.pacs002.PaymentTransaction110;
 import bifast.library.iso20022.pacs002.StatusReason6Choice;
 import bifast.library.iso20022.pacs002.StatusReasonInformation12;
 import bifast.library.iso20022.pacs002.SupplementaryDataEnvelope1;
+import bifast.mock.processor.UtilService;
 import bifast.library.iso20022.pacs002.AccountIdentification4Choice;
-import bifast.library.iso20022.pacs002.BIAddtlCstmrInf;
 import bifast.library.iso20022.pacs002.BISupplementaryData1;
 import bifast.library.iso20022.pacs002.BISupplementaryDataEnvelope1;
 import bifast.library.iso20022.pacs002.BranchAndFinancialInstitutionIdentification6;
@@ -39,20 +33,19 @@ import bifast.library.iso20022.pacs002.BranchAndFinancialInstitutionIdentificati
 @Service
 public class SettlementMessageService {
 
+	@Autowired private UtilService utilService;
 
-	public FIToFIPaymentStatusReportV10 SettlementConfirmation (String msgId, 
+	public FIToFIPaymentStatusReportV10 SettlementConfirmation (
 							BusinessMessage orgnlMessage) throws DatatypeConfigurationException {
 		
 		FIToFIPaymentStatusReportV10 pacs002 = new FIToFIPaymentStatusReportV10();
 
 		// GrpHdr
+		String msgId = utilService.genMessageId("010", "FASTIDJA");
+
 		GroupHeader91 grpHdr = new GroupHeader91();
 		grpHdr.setMsgId(msgId);  // 010 Transaction-Type untuk CSTMRCRDTTRN
 		
-//		GregorianCalendar gcal = new GregorianCalendar();
-//		gcal.setTimeZone(TimeZone.getTimeZone(ZoneOffset.systemDefault()));
-//		XMLGregorianCalendar xcal = DatatypeFactory.newInstance().newXMLGregorianCalendar(gcal);
-//		grpHdr.setCreDtTm(xcal);
         DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
         LocalDateTime localDateTime = LocalDateTime.now();
 		grpHdr.setCreDtTm(fmt.format(localDateTime));
@@ -82,8 +75,10 @@ public class SettlementMessageService {
 		pacs002.getTxInfAndSts().get(0).getStsRsnInf().get(0).setRsn(new StatusReason6Choice());
 		pacs002.getTxInfAndSts().get(0).getStsRsnInf().get(0).getRsn().setPrtry("U000");
 		
-		pacs002.getTxInfAndSts().get(0).getStsRsnInf().get(0).getAddtlInf().add("OK");
+		pacs002.getTxInfAndSts().get(0).setClrSysRef("001");
 		
+//		String addtInfo = orgnlMessage.getDocument().getFiToFICstmrCdtTrf().getCdtTrfTxInf().get(0).getRmtInf().getUstrd().get(0);
+//		pacs002.getTxInfAndSts().get(0).getStsRsnInf().get(0).getAddtlInf().add(addtInfo);
 		
 		// TxInfAndSts / OrgnlTxRef
 		pacs002.getTxInfAndSts().get(0).setOrgnlTxRef(new OriginalTransactionReference28());
@@ -135,9 +130,9 @@ public class SettlementMessageService {
 		pacs002.getTxInfAndSts().get(0).getOrgnlTxRef().getCdtrAcct().getId().getOthr().setId(
 				orgnlMessage.getDocument().getFiToFICstmrCdtTrf().getCdtTrfTxInf().get(0).getCdtrAcct().getId().getOthr().getId());
 
-		pacs002.getTxInfAndSts().get(0).getOrgnlTxRef().getCdtrAcct().setTp(new CashAccountType2Choice ());
-		pacs002.getTxInfAndSts().get(0).getOrgnlTxRef().getCdtrAcct().getTp().setPrtry(
-				orgnlMessage.getDocument().getFiToFICstmrCdtTrf().getCdtTrfTxInf().get(0).getCdtrAcct().getTp().getPrtry()	);
+//		pacs002.getTxInfAndSts().get(0).getOrgnlTxRef().getCdtrAcct().setTp(new CashAccountType2Choice ());
+//		pacs002.getTxInfAndSts().get(0).getOrgnlTxRef().getCdtrAcct().getTp().setPrtry(
+//				orgnlMessage.getDocument().getFiToFICstmrCdtTrf().getCdtTrfTxInf().get(0).getCdtrAcct().getTp().getPrtry()	);
 
 		// TxInfAndSts ++SplmtryData	+++Envlp++++Dtl	
 		pacs002.getTxInfAndSts().get(0).getSplmtryData().add(new BISupplementaryData1());
@@ -157,25 +152,6 @@ public class SettlementMessageService {
 		pacs002.getTxInfAndSts().get(0).getSplmtryData().get(0).getEnvlp().getDtl().getCdtrAgtAcct().getId().setOthr(new GenericAccountIdentification1());
 		pacs002.getTxInfAndSts().get(0).getSplmtryData().get(0).getEnvlp().getDtl().getCdtrAgtAcct().getId().getOthr().setId("567890");
 
-		
-		// TxInfAndSts / SplmtryData
-
-//		if ((!(null==seed.getCreditorType())) ||
-//				(!(null==seed.getCreditorId())) ||
-//				(!(null==seed.getCreditorResidentialStatus())) ||
-//				(!(null==seed.getCreditorTown())) ) {
-//				
-//			splmtryData.getEnvlp().getDtl().setCdtr(new BIAddtlCstmrInf());
-//			
-//			splmtryData.getEnvlp().getDtl().getCdtr().setTp(seed.getCreditorType());
-//			splmtryData.getEnvlp().getDtl().getCdtr().setId(seed.getCreditorId());
-//			splmtryData.getEnvlp().getDtl().getCdtr().setRsdntSts(seed.getCreditorResidentialStatus());
-//			splmtryData.getEnvlp().getDtl().getCdtr().setTwnNm(seed.getCreditorTown());
-//
-//			txInfAndSts.getSplmtryData().add(splmtryData);
-//		}
-		
-		
 		return pacs002;
 	}
 

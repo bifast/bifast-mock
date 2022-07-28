@@ -143,7 +143,7 @@ public class ProxyRegistrationService {
 		
 		String proxyType = bm.getDocument().getPrxyRegn().getRegn().getPrxy().getTp();
 		String proxyVal = bm.getDocument().getPrxyRegn().getRegn().getPrxy().getVal();
-		Optional<AccountProxy> oAccountProxy = proxyRepo.findByProxyTypeAndProxyVal(proxyType, proxyVal);
+		Optional<AccountProxy> oAccountProxy = proxyRepo.getValidByProxyTypeAndByProxyVal(proxyType, proxyVal);
 
 		if (oAccountProxy.isEmpty()) {
 			seed.setStatus("RJCT");

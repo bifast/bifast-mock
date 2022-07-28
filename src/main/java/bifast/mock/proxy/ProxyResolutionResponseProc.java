@@ -53,10 +53,9 @@ public class ProxyResolutionResponseProc implements Processor{
 		seed.setOrgnlPrxyRqstrTp(proxyType);
 		seed.setOrgnlPrxyRqstrVal(proxyVal);
 
-		Optional<AccountProxy> oAccountProxy = accountProxyRepository.getByProxyTypeAndByProxyValAndNotInactive(proxyType, proxyVal);
+		Optional<AccountProxy> oAccountProxy = accountProxyRepository.getValidByProxyTypeAndByProxyVal(proxyType, proxyVal);
 		
 		if (oAccountProxy.isEmpty()) {
-			System.out.println("empty");
 			seed.setStatus("RJCT");
 			seed.setReason("U804");
 		}

@@ -29,12 +29,12 @@ public interface AccountProxyRepository extends JpaRepository<AccountProxy, Long
 			+ "WHERE accountProxy.proxyType = :proxyType "
 			+ "and accountProxy.proxyVal = :proxyVal "
 			+ "and accountProxy.accountStatus <> 'ICTV' ")
-	Optional<AccountProxy> getByProxyTypeAndByProxyValAndNotInactive(@Param("proxyType") String proxyType,@Param("proxyVal") String proxyVal);
+	Optional<AccountProxy> getValidByProxyTypeAndByProxyVal(@Param("proxyType") String proxyType,@Param("proxyVal") String proxyVal);
 
 	@Query("SELECT accountProxy FROM AccountProxy accountProxy WHERE accountProxy.scndIdTp = :scndIdTp and accountProxy.scndIdVal = :scndIdVal")
 	List<AccountProxy> getListByScndIdTpAndByScndIdVal(@Param("scndIdTp") String scndIdTp,@Param("scndIdVal") String scndIdVal);
 
-	Optional<AccountProxy> findByProxyTypeAndProxyVal(String proxyType, String proxyVal);
+	List<AccountProxy> findByProxyTypeAndProxyVal(String proxyType, String proxyVal);
 	Optional<AccountProxy> findByProxyTypeAndProxyValAndAccountStatus(String proxyType, String proxyVal, String accountStatus);
 	Optional<AccountProxy> findByReginId (String reginId);
 	Optional<AccountProxy> findByAccountNumberAndRegisterBank (String accountNumber, String registerBank);

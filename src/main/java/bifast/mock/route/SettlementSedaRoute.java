@@ -13,13 +13,13 @@ import com.fasterxml.jackson.module.jaxb.JaxbAnnotationModule;
 
 import bifast.library.iso20022.custom.BusinessMessage;
 import bifast.mock.processor.BuildReversal;
-import bifast.mock.processor.SettlementProcessor;
+import bifast.mock.processor.SettlementProc;
 
 @Component
 public class SettlementSedaRoute extends RouteBuilder {
 	
 	@Autowired private BuildReversal buildReversal;
-	@Autowired private SettlementProcessor settlementProcessor;
+	@Autowired private SettlementProc settlementProc;
 	
 	JacksonDataFormat jsonBusinessMessageDataFormat = new JacksonDataFormat(BusinessMessage.class);
 
@@ -38,31 +38,17 @@ public class SettlementSedaRoute extends RouteBuilder {
 		configureJson();
 		
 	
-		from("sql:select * from mock_pacs002 where result = 'ACTC' and sttl is null")
+		from("seda:settlement")
 			.routeId("settlement")
 
-			
-			.setHeader("sttl_tableqry", simple("${body}"))
-			.setHeader("sttl_id", simple("${body[ID]}"))
-
-			.setBody(simple("${header.sttl_tableqry[FULL_MESSAGE]}"))
-			.unmarshal(jsonBusinessMessageDataFormat)
-			.setHeader("hdr_ctresponse", simple("${body}"))
-
-			.log("${header.sttl_tableqry[RESULT]}")
-	
-			.setBody(simple("${header.sttl_tableqry[CT_REQUEST]}"))
-			.unmarshal(jsonBusinessMessageDataFormat)
-			.setHeader("hdr_ctrequest", simple("${body}"))
-
-		
-			.process(settlementProcessor)
+			.delay(2000)
+			.process(settlementProc)
 		
 			.marshal(jsonBusinessMessageDataFormat)
+			.setProperty("jsonSettlement", simple("${body}"))
 			.log("Submit settlement: ${body}")
 			.doTry()
-				.to("rest:post:?host={{komi.inbound-url}}"
-					+ "&exchangePattern=InOnly"
+				.to("rest:post:?host={{komi.inbound-url}}&exchangePattern=InOnly"
 //						+ "&bridgeEndpoint=true"
 					)
 				
@@ -75,7 +61,6 @@ public class SettlementSedaRoute extends RouteBuilder {
 	    	.log("Reversal Flag: ${header.hdr_reversal}")
 			.filter().simple("${header.hdr_reversal} == 'YES' ")
 				.log("submit reversal message")
-				.setBody(simple("${header.sttl_tableqry[CT_REQUEST]}"))
 				.log("${body}")
 				.unmarshal(jsonBusinessMessageDataFormat)
 				
@@ -83,8 +68,10 @@ public class SettlementSedaRoute extends RouteBuilder {
 				.to("seda:reversal")
 			.end()
 			
-			.to("sql:update mock_pacs002 set sttl = 'DONE' where id::varchar = :#${header.sttl_id}::varchar")
-			.removeHeaders("sttl_*")
+			.to("sql:update ct_response set bizsvc = 'STTL', "
+					+ "response = 'ASCS' "
+//					+ ", json_response = :#${exchangeProperty.jsonSettlement} "
+					+ "where endtoendid::varchar = :#${exchangeProperty.endtoendid}::varchar")
 
 		;
 

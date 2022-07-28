@@ -1,14 +1,14 @@
 package bifast.mock.processor;
 
-import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.GregorianCalendar;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.apache.camel.Exchange;
+import org.apache.camel.FluentProducerTemplate;
 import org.apache.camel.Processor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +33,7 @@ public class CreditTransferResponseProcessor implements Processor{
 	@Autowired private AccountProxyRepository accountRepo;
 	@Autowired private CTResponseRepository CTRepo ;
 	@Autowired private MsgHeaderService hdrService;
+	@Autowired private CreditResponseService creditResponseService;
 	@Autowired private Pacs002MessageService pacs002Service;
 	@Autowired private UtilService utilService;
 	
@@ -44,7 +45,6 @@ public class CreditTransferResponseProcessor implements Processor{
 	@Override
 	public void process(Exchange exchange) throws Exception {
 		
-//		BusinessMessage objRequest = exchange.getMessage().getHeader("objRequest", BusinessMessage.class);	
 		BusinessMessage objRequest = exchange.getMessage().getBody(BusinessMessage.class);	
 
 		exchange.setProperty("ctRequest", objRequest);
@@ -66,25 +66,45 @@ public class CreditTransferResponseProcessor implements Processor{
 		else {
 
 			Optional<AccountProxy> oAcct = accountRepo.findByAccountNumberAndRegisterBank(norekCdtr, bank);
-			BusinessMessage resultMessg = buildBusinessMessage (objRequest, oAcct);
-			saveCreditResponse(objRequest, resultMessg);
-	
-			if (addInfo.contains("cttimeout")) {
-			    try
-			    {
-			    	logger.info("delay dulu selama " + delay);
-			    	LocalDateTime dt1 = LocalDateTime.now();
-			        Thread.sleep(delay);
-			        Long duration = Duration.between(LocalDateTime.now(), dt1).getSeconds();
-			        logger.info("Oke : " + duration);
-			    }
-			    catch(InterruptedException ex)
-			    {
-			        Thread.currentThread().interrupt();
-			    }
+			BusinessMessage resultMessg = null;
+
+			CTResponse ctResponse = new CTResponse();
+	        ctResponse.setBizSvc("CLEAR");
+	        ctResponse.setEndToEndId(exchange.getProperty("endtoendid", String.class));
+	        ctResponse.setJsonCtRequest(utilService.serializeBusinessMessage(objRequest));
+	        
+			if (oAcct.isPresent()) {
+				AccountProxy account = oAcct.get();
+		        ctResponse.setCreditorName(account.getAccountName());
+		        if (account.getAccountStatus().equals("ACTV")) {
+		        	ctResponse.setResponse("ACTC");
+		        	ctResponse.setReason("U000");				
+		        }
+		        else {
+		        	ctResponse.setResponse("RJCT");
+		        	ctResponse.setReason("U102");		
+		        }
+			} 
+			else {
+	        	ctResponse.setResponse("RJCT");
+	        	ctResponse.setReason("U101");
 			}
 			
+	        CTRepo.save(ctResponse);
+
+			resultMessg = creditResponseService.buildBusinessMessage(objRequest, ctResponse);
+				
+			if (addInfo.contains("cttimeout")) 
+				TimeUnit.SECONDS.sleep(delay);
+
 			exchange.getMessage().setBody(resultMessg);
+			
+			// kirim settlement jika ctResponse.getResponse = ACTC
+			if (ctResponse.getResponse().equals("ACTC")) {
+				TimeUnit.SECONDS.sleep(2);
+	            FluentProducerTemplate pt = exchange.getContext().createFluentProducerTemplate();
+	            pt.withExchange(exchange).to("seda:settlement?exchangePattern=InOnly&timeout=0").asyncSend();
+			}
 			
 		}
 	}
@@ -161,20 +181,7 @@ public class CreditTransferResponseProcessor implements Processor{
 
 		return busMesg;
 	}
-	
-    public void saveCreditResponse (BusinessMessage requestMsg, BusinessMessage responseMsg) throws Exception {
-        
-        CTResponse ctResponse = new CTResponse();
-        ctResponse.setCdtrAcct(requestMsg.getDocument().getFiToFICstmrCdtTrf().getCdtTrfTxInf().get(0).getCdtrAcct().getId().getOthr().getId());
-        ctResponse.setEndToEndId(requestMsg.getDocument().getFiToFICstmrCdtTrf().getCdtTrfTxInf().get(0).getPmtId().getEndToEndId());
-        ctResponse.setJsonCtRequest(utilService.serializeBusinessMessage(requestMsg));
-//        ctResponse.setJsonCtResponse(utilService.serializeBusinessMessage(responseMsg));
-        ctResponse.setResponse(responseMsg.getDocument().getFiToFIPmtStsRpt().getTxInfAndSts().get(0).getTxSts());
-        ctResponse.setBizSvc("CLEAR");
-        CTRepo.save(ctResponse);
-        
-    }
-    
+	    
     private String admi002 () {
 		String str = "{\n"
 				+ "  \"BusMsg\" : {\n"

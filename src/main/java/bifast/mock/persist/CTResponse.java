@@ -22,11 +22,10 @@ public class CTResponse {
     
     @Column(name="json_request", length=5000)
     private String jsonCtRequest;
-//    @Column(name="json_response",columnDefinition="CLOB(10K)")
-//    private String jsonCtResponse;
+    private String creditorName;
     
     private String response;
-    private String cdtrAcct;
+    private String reason;
     
 	public Long getId() {
 		return Id;
@@ -52,24 +51,24 @@ public class CTResponse {
 	public void setJsonCtRequest(String jsonCtRequest) {
 		this.jsonCtRequest = jsonCtRequest;
 	}
-//	public String getJsonCtResponse() {
-//		return jsonCtResponse;
-//	}
-//	public void setJsonCtResponse(String jsonCtResponse) {
-//		this.jsonCtResponse = jsonCtResponse;
-//	}
+	public String getCreditorName() {
+		return creditorName;
+	}
+	public void setCreditorName(String creditorName) {
+		this.creditorName = creditorName;
+	}
 	public String getResponse() {
 		return response;
 	}
 	public void setResponse(String response) {
 		this.response = response;
 	}
-	public String getCdtrAcct() {
-		return cdtrAcct;
+	public String getReason() {
+		return reason;
 	}
-	public void setCdtrAcct(String cdtrAcct) {
-		this.cdtrAcct = cdtrAcct;
+	public void setReason(String reason) {
+		this.reason = reason;
 	}
-
+    
     
 }

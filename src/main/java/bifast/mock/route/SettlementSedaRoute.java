@@ -41,11 +41,9 @@ public class SettlementSedaRoute extends RouteBuilder {
 		from("seda:settlement")
 			.routeId("settlement")
 
-			.delay(2000)
 			.process(settlementProc)
 		
 			.marshal(jsonBusinessMessageDataFormat)
-			.setProperty("jsonSettlement", simple("${body}"))
 			.log("Submit settlement: ${body}")
 			.doTry()
 				.to("rest:post:?host={{komi.inbound-url}}&exchangePattern=InOnly"
@@ -69,8 +67,7 @@ public class SettlementSedaRoute extends RouteBuilder {
 			.end()
 			
 			.to("sql:update ct_response set bizsvc = 'STTL', "
-					+ "response = 'ASCS' "
-//					+ ", json_response = :#${exchangeProperty.jsonSettlement} "
+					+ "response = 'ACSC' "
 					+ "where endtoendid::varchar = :#${exchangeProperty.endtoendid}::varchar")
 
 		;

@@ -125,7 +125,7 @@ public class CiHubRoute extends RouteBuilder {
 					.log("Akan process CT")
 					
 					.process(creditTransferResponseProcessor)
-					.to("seda:settlement?exchangePattern=InOnly")
+//					.to("seda:settlement?exchangePattern=InOnly")
 					
 					.setHeader("hdr_ctResponseObj",simple("${body}"))		
 					

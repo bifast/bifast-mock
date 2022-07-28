@@ -1,14 +1,11 @@
 package bifast.mock.processor;
 
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 
-import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
-import org.apache.camel.ProducerTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -26,12 +23,12 @@ import bifast.mock.persist.CTResponseRepository;
 @Component
 public class PaymentStatusResponseProc implements Processor{
 
+	@Autowired private CreditResponseService creditResponseService;
 	@Autowired private CTResponseRepository  ctRepo;
-	@Autowired private UtilService utilService;
 	@Autowired private MsgHeaderService hdrService;
 	@Autowired private Pacs002MessageService pacs002Service;
-	@Autowired ProducerTemplate producerTemplate;
-	@Autowired private CreditTransferResponseProcessor ctResponseProc;
+	@Autowired private SettlementProc settlementProc;
+	@Autowired private UtilService utilService;
 
 	@Value("${komi.timeout-ps}")
 	private int delay;
@@ -47,23 +44,32 @@ public class PaymentStatusResponseProc implements Processor{
 
 		if (oct.isPresent()) {
 			CTResponse ctResponse = oct.get();
+			System.out.println("nemu dgn status: " + ctResponse.getResponse());
 			BusinessMessage ctReq = utilService.deserializeBusinessMessage(ctResponse.getJsonCtRequest());
 			
-	    	String addInfo = "";
-			if (null != ctReq.getDocument().getFiToFICstmrCdtTrf().getCdtTrfTxInf().get(0).getRmtInf()) 
-				addInfo = ctReq.getDocument().getFiToFICstmrCdtTrf().getCdtTrfTxInf().get(0).getRmtInf().getUstrd().get(0).toLowerCase();
+			exchange.setProperty("ctRequest", ctReq);
 
-			if ((addInfo.equals("timeout")) || (addInfo.contains("pstimeout"))) {
-				System.out.println("PS delay dulu selama " +  delay + " ms");
-				TimeUnit.SECONDS.sleep(delay);
+			BusinessMessage psResponse = null;
+
+			if (ctResponse.getBizSvc().equals("CLEAR")) 
+				psResponse = creditResponseService.buildBusinessMessage(ctReq, ctResponse);
+				
+			else if (ctResponse.getBizSvc().equals("STTL")) {
+				settlementProc.process(exchange);
+				psResponse = exchange.getMessage().getBody(BusinessMessage.class);
 			}
 
-//			producerTemplate.getDefaultEndpoint()
+			exchange.getMessage().setBody(psResponse);
 			
-			Exchange ex = producerTemplate.send(ctResponseProc);
+			String addInfo = "";
+			if (null != ctReq.getDocument().getFiToFICstmrCdtTrf().getCdtTrfTxInf().get(0).getRmtInf()) 
+				addInfo = ctReq.getDocument().getFiToFICstmrCdtTrf().getCdtTrfTxInf().get(0).getRmtInf().getUstrd().get(0).toLowerCase();
+//			if ((addInfo.equals("timeout")) || (addInfo.contains("pstimeout"))) {
+//				System.out.println("PS delay dulu selama " +  delay + " ms");
+//				TimeUnit.SECONDS.sleep(delay);
+//			}
 
-			BusinessMessage ctResp = ex.getMessage().getBody(BusinessMessage.class);
-			exchange.getMessage().setBody(utilService.serializeBusinessMessage(ctResp));
+			
 		}
 
 		else  { // nggak ketemu juga 

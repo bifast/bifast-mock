@@ -13,27 +13,28 @@
 
 POST http://localhost:9002/komi-outbound/service HTTP/1.1
 Content-Type: application/json
-clientId: IB1
+Authorization: Basic MB:password
 
 {
-  "CreditTransferRequest" : {
-    "TransactionId" : "211440",
-    "CategoryPurpose" : "01",
-    "DebtorId" : "642245",
-    "DebtorIdType" : "01",
-    "DebtorAccountNumber" : "53314",
-    "DebtorAccountType" : "CACC",
-    "Amount" : 453272,
-    "RecipientBank" : "BMNDIDJA",
-    "CreditorId" : "C224403",
-    "CreditorIdType" : "01",
-    "CreditorAccountNumber" : "274851",
-    "CreditorAccountType" : "SVGS",
-    "CreditorProxyType" : "02", 
-    "CreditorProxyValue" : "fariz@gmail.com",
-    "PaymentInfo" : "untuk bayaran"
+  "CreditTransferRequest": {
+    "NoRef": "MOB22072603571{{$randomInt 0000 9999}}",
+    "TerminalId": "MOBILE0001",
+    "RecipientBank": "CENAIDJA",
+    "CategoryPurpose": "02",
+    "Amount": "95000.00",
+    "FeeTransfer": "0.00",
+    "DebtorName": "SULISTIYOWATI",
+    "DebtorAccountNumber": "2012102710197",
+    "DebtorAccountType": "SVGS",
+    "DebtorId": "1002222",
+    "DebtorType": "01",
+    "CreditorName": "ANDRIAN S",
+    "CreditorAccountNumber": "112211333",
+    "CreditorAccountType": "CACC",
+    "PaymentInformation": ""
   }
 }
+
 ###
 
 ###

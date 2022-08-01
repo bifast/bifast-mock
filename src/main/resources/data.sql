@@ -6,3 +6,8 @@ insert into ACCOUNT_PROXY (ID,ACCOUNT_NAME,ACCOUNT_NUMBER,ACCOUNT_STATUS,ACCOUNT
 ('10005','SYAMSUL HADI','112211777','ICTV','CACC','SYAMSUL HADI','01','0811133444','BRINIDJA','01','25636057','25636057','01','01','0300','51268786'),
 ('10006','JOKO ARIFIN','221211888','ACTV','CACC','JOKO ARIFIN','01','0811133555','BMRIIDJA','01','25666057','25666057','01','01','0300','11098756'),
 ('10007','WINDI BUSTAMI','221211999','ICTV','CACC','WINDI BUSTAMI','01','0811133666','BMRIIDJA','01','25666444','25666444','01','01','0300','1295536');
+
+insert into ct_response 
+(ID,BIZSVC,CREDITOR_NAME,ENDTOENDID,REASON,RESPONSE,JSON_REQUEST) values
+(1001,'STTL','ADRIAN S','20220801SIHBIDJ1010O0229740005','U000','ASCS','{"BusMsg":{"AppHdr":{"Fr":{"FIId":{"FinInstnId":{"Othr":{"Id":"SIHBIDJ1"}}}},"To":{"FIId":{"FinInstnId":{"Othr":{"Id":"FASTIDJA"}}}},"BizMsgIdr":"20220801SIHBIDJ1010O0227648002","MsgDefIdr":"pacs.008.001.08","CreDt":"2022-08-01T00:40:49Z"},"Document":{"FIToFICstmrCdtTrf":{"GrpHdr":{"MsgId":"20220801SIHBIDJ101027648002","CreDtTm":"2022-08-01T07:40:49.040","NbOfTxs":"1","SttlmInf":{"SttlmMtd":"CLRG"}},"CdtTrfTxInf":[{"PmtId":{"EndToEndId":"20220801SIHBIDJ1010O0227648002","TxId":"20220801SIHBIDJ101027648002"},"PmtTpInf":{"LclInstrm":{"Prtry":"02"},"CtgyPurp":{"Prtry":"01002"}},"IntrBkSttlmAmt":{"Value":"95000.00","Ccy":"IDR"},"ChrgBr":"DEBT","Dbtr":{"Nm":"SULISTIYOWATI","Id":{"OrgId":{"Othr":[{"Id":"1002222"}]}}},"DbtrAcct":{"Id":{"Othr":{"Id":"2012102710197"}},"Tp":{"Prtry":"SVGS"}},"DbtrAgt":{"FinInstnId":{"Othr":{"Id":"SIHBIDJ1"}}},"CdtrAgt":{"FinInstnId":{"Othr":{"Id":"CENAIDJA"}}},"Cdtr":{"Nm":"ANDRIAN S"},"CdtrAcct":{"Id":{"Othr":{"Id":"112211333"}},"Tp":{"Prtry":"CACC"}},"RmtInf":{"Ustrd":["0"]}}]}}}}')
+

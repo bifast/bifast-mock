@@ -48,7 +48,7 @@ public class UtilService {
 		String strToday = LocalDateTime.now().format(formatter);
 		DecimalFormat df = new DecimalFormat("00000000");
 		String strCounter = df.format(getInboundCounter());
-		return strToday + config.getBicode() +  trxType + "H03" + strCounter;
+		return strToday + config.getBicode() +  trxType + "H99" + strCounter;
 	}
 	
 	public String genRfiBusMsgId (String trxType, String channel, String bankCode ) {

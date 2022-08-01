@@ -10,6 +10,8 @@ public class InboundMockWrapper {
 	private CTRequestPojo ctRequest;
 	@JsonProperty("PaymentRequest")
 	private PaymentRequestPojo paymentRequest;
+	@JsonProperty("ReversalCT")
+	private RevCTPojo reversalCT;
 	
 	public AERequestPojo getAeRequest() {
 		return aeRequest;
@@ -28,6 +30,12 @@ public class InboundMockWrapper {
 	}
 	public void setPaymentRequest(PaymentRequestPojo paymentRequest) {
 		this.paymentRequest = paymentRequest;
+	}
+	public RevCTPojo getReversalCT() {
+		return reversalCT;
+	}
+	public void setReversalCT(RevCTPojo reversalCT) {
+		this.reversalCT = reversalCT;
 	}
 	
 	

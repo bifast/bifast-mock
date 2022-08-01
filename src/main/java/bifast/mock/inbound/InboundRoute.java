@@ -12,6 +12,7 @@ import com.fasterxml.jackson.module.jaxb.JaxbAnnotationModule;
 
 import bifast.library.iso20022.custom.BusinessMessage;
 import bifast.mock.inbound.pojo.PaymentRequestPojo;
+import bifast.mock.inbound.pojo.RevCTPojo;
 import bifast.mock.inbound.pojo.AERequestPojo;
 import bifast.mock.inbound.pojo.CTResponsePojo;
 import bifast.mock.inbound.pojo.InboundMockWrapper;
@@ -24,6 +25,7 @@ public class InboundRoute extends RouteBuilder {
 
 	JacksonDataFormat mockRequestWrapperJDF = new JacksonDataFormat(InboundMockWrapper.class);
 	JacksonDataFormat pymtRequestJDF = new JacksonDataFormat(PaymentRequestPojo.class);
+	JacksonDataFormat reversalCTJDF = new JacksonDataFormat(RevCTPojo.class);
 	JacksonDataFormat ctResponseJDF = new JacksonDataFormat(CTResponsePojo.class);
 	JacksonDataFormat busMesgJDF = new JacksonDataFormat(BusinessMessage.class);
 	JacksonDataFormat aeRequestJDF = new JacksonDataFormat(AERequestPojo.class);
@@ -44,6 +46,11 @@ public class InboundRoute extends RouteBuilder {
 		paymtRequestJDF.setInclude("NON_NULL");
 		paymtRequestJDF.setInclude("NON_EMPTY");
 		paymtRequestJDF.enableFeature(DeserializationFeature.UNWRAP_ROOT_VALUE);
+
+		reversalCTJDF.addModule(new JaxbAnnotationModule());  //supaya nama element pake annot JAXB (uppercasecamel)
+		reversalCTJDF.setInclude("NON_NULL");
+		reversalCTJDF.setInclude("NON_EMPTY");
+		reversalCTJDF.enableFeature(DeserializationFeature.UNWRAP_ROOT_VALUE);
 
 		ctResponseJDF.addModule(new JaxbAnnotationModule());  //supaya nama element pake annot JAXB (uppercasecamel)
 		ctResponseJDF.setInclude("NON_NULL");
@@ -90,13 +97,15 @@ public class InboundRoute extends RouteBuilder {
 			.choice()
 				.when().simple("${body.paymentRequest} != null")
 					.log("PaymentRequest")
-					.marshal(paymtRequestJDF)
-					.unmarshal(paymtRequestJDF)
+					.marshal(paymtRequestJDF).unmarshal(paymtRequestJDF)
 					.to("direct:payment")
+				.when().simple("${body.reversalCT} != null")
+					.log("ReversalCT")
+					.marshal(reversalCTJDF).unmarshal(reversalCTJDF)
+					.to("direct:reversalct")
 				.when().simple("${body.aeRequest} != null")
 					.log("AccountEnquiry")
-					.marshal(aeRequestJDF)
-					.unmarshal(aeRequestJDF)
+					.marshal(aeRequestJDF).unmarshal(aeRequestJDF)
 					.to("direct:inb_ae")
 				.when().simple("${body.ctRequest} != null")
 					.log("CreditTransferRequest")

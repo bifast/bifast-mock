@@ -12,7 +12,7 @@ import com.fasterxml.jackson.module.jaxb.JaxbAnnotationModule;
 
 import bifast.library.iso20022.custom.BusinessMessage;
 import bifast.mock.inbound.pojo.PaymentRequestPojo;
-import bifast.mock.inbound.pojo.RevCTPojo;
+import bifast.mock.incomingtrns.RevCTRequestDTO;
 import bifast.mock.inbound.pojo.AERequestPojo;
 import bifast.mock.inbound.pojo.CTResponsePojo;
 import bifast.mock.inbound.pojo.InboundMockWrapper;
@@ -25,7 +25,7 @@ public class InboundRoute extends RouteBuilder {
 
 	JacksonDataFormat mockRequestWrapperJDF = new JacksonDataFormat(InboundMockWrapper.class);
 	JacksonDataFormat pymtRequestJDF = new JacksonDataFormat(PaymentRequestPojo.class);
-	JacksonDataFormat reversalCTJDF = new JacksonDataFormat(RevCTPojo.class);
+	JacksonDataFormat reversalCTJDF = new JacksonDataFormat(RevCTRequestDTO.class);
 	JacksonDataFormat ctResponseJDF = new JacksonDataFormat(CTResponsePojo.class);
 	JacksonDataFormat busMesgJDF = new JacksonDataFormat(BusinessMessage.class);
 	JacksonDataFormat aeRequestJDF = new JacksonDataFormat(AERequestPojo.class);

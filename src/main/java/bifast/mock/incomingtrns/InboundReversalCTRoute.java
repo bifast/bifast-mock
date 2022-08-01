@@ -1,4 +1,4 @@
-package bifast.mock.inbound;
+package bifast.mock.incomingtrns;
 
 import java.util.Optional;
 
@@ -21,9 +21,6 @@ import bifast.library.iso20022.pacs008.BranchAndFinancialInstitutionIdentificati
 import bifast.library.iso20022.pacs008.CashAccount38;
 import bifast.library.iso20022.pacs008.PartyIdentification135;
 import bifast.library.iso20022.pacs008.SupplementaryDataEnvelope1;
-import bifast.mock.inbound.pojo.CTResponsePojo;
-import bifast.mock.inbound.pojo.PaymentRequestPojo;
-import bifast.mock.inbound.pojo.RevCTPojo;
 import bifast.mock.persist.CTResponse;
 import bifast.mock.persist.CTResponseRepository;
 import bifast.mock.processor.UtilService;
@@ -34,6 +31,7 @@ public class InboundReversalCTRoute extends RouteBuilder{
 	@Autowired UtilService utilService;
 
 	JacksonDataFormat busMesgJDF = new JacksonDataFormat(BusinessMessage.class);
+	JacksonDataFormat revResponseJDF = new JacksonDataFormat(RevCTResponseDTO.class);
 
 	@Override
 	public void configure() throws Exception {
@@ -44,18 +42,34 @@ public class InboundReversalCTRoute extends RouteBuilder{
 		busMesgJDF.setInclude("NON_NULL");
 		busMesgJDF.setInclude("NON_EMPTY");
 
+		revResponseJDF.enableFeature(SerializationFeature.WRAP_ROOT_VALUE);
+		revResponseJDF.setInclude("NON_NULL");
+		revResponseJDF.setInclude("NON_EMPTY");
+
+		
+		onException(bifast.mock.incomingtrns.RevCTNotFoundException.class)
+			.log("error")
+			.process(new Processor() {
+				public void process(Exchange exchange) throws Exception {
+					RevCTRequestDTO revCt = exchange.getMessage().getBody(RevCTRequestDTO.class);
+					RevCTResponseDTO resp = new RevCTResponseDTO();
+					resp.setEndToEndId(exchange.getMessage().getHeader("revct_e2eid", String.class));
+					resp.setResponse("RJCT");
+					exchange.getMessage().setBody(resp);
+				}
+			})
+			.marshal(revResponseJDF)
+			.removeHeaders("revct_*")
+			.handled(true);
 
 		from("direct:reversalct").routeId("reversal")
-			.setExchangePattern(ExchangePattern.InOnly)
 			.log("start direct:reversalct")
 
-			.setHeader("hdr_revreq", simple("${body}"))
-			
-			.log("${body.endToEndId}")
+			.setHeader("revct_e2eid", simple("${body.endToEndId}"))
 
 			.process(new Processor() {
 				public void process(Exchange exchange) throws Exception {
-					RevCTPojo revCt = exchange.getMessage().getBody(RevCTPojo.class);
+					RevCTRequestDTO revCt = exchange.getMessage().getBody(RevCTRequestDTO.class);
 					Optional<CTResponse> oCTResponse = ctResponseRepo.findByEndToEndId(revCt.getEndToEndId());
 					if (oCTResponse.isPresent()) {
 						CTResponse ctResponse = oCTResponse.get();
@@ -87,15 +101,34 @@ public class InboundReversalCTRoute extends RouteBuilder{
 						
 						exchange.getMessage().setBody(ctReq);
 					}
+					
+					else {
+						throw new RevCTNotFoundException("CreditTransfer Not Found.") ;
+					}
 				}
 			})
+			
+			
 			.marshal(busMesgJDF)
 			.log("${body}")
 
 			.to("rest:post:?host={{komi.inbound-url}}"
 					+ "&exchangePattern=InOnly&bridgeEndpoint=true")
+			.convertBodyTo(String.class)
+			.unmarshal(busMesgJDF)
+			
+			.process(new Processor() {
+				public void process(Exchange exchange) throws Exception {
+					BusinessMessage revCtResp = exchange.getMessage().getBody(BusinessMessage.class);
+					revCtResp.getDocument().getFiToFIPmtStsRpt().getTxInfAndSts().get(0).getTxSts();
+					RevCTResponseDTO resp = new RevCTResponseDTO();
+					resp.setEndToEndId(exchange.getMessage().getHeader("revct_e2eid", String.class));
+					resp.setResponse(revCtResp.getDocument().getFiToFIPmtStsRpt().getTxInfAndSts().get(0).getTxSts());
+					exchange.getMessage().setBody(resp);
+				}
+			})
+			.marshal(revResponseJDF)
 
-			.marshal(busMesgJDF)
 			.log("${body}")
 
 			;

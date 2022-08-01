@@ -2,6 +2,8 @@ package bifast.mock.inbound.pojo;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import bifast.mock.incomingtrns.RevCTRequestDTO;
+
 public class InboundMockWrapper {
 
 	@JsonProperty("AccountEnquiryRequest")
@@ -11,7 +13,7 @@ public class InboundMockWrapper {
 	@JsonProperty("PaymentRequest")
 	private PaymentRequestPojo paymentRequest;
 	@JsonProperty("ReversalCT")
-	private RevCTPojo reversalCT;
+	private RevCTRequestDTO reversalCT;
 	
 	public AERequestPojo getAeRequest() {
 		return aeRequest;
@@ -31,10 +33,10 @@ public class InboundMockWrapper {
 	public void setPaymentRequest(PaymentRequestPojo paymentRequest) {
 		this.paymentRequest = paymentRequest;
 	}
-	public RevCTPojo getReversalCT() {
+	public RevCTRequestDTO getReversalCT() {
 		return reversalCT;
 	}
-	public void setReversalCT(RevCTPojo reversalCT) {
+	public void setReversalCT(RevCTRequestDTO reversalCT) {
 		this.reversalCT = reversalCT;
 	}
 	

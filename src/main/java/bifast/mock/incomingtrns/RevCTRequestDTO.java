@@ -1,9 +1,9 @@
-package bifast.mock.inbound.pojo;
+package bifast.mock.incomingtrns;
 
 import com.fasterxml.jackson.annotation.JsonRootName;
 
 @JsonRootName("ReversalCT")
-public class RevCTPojo {
+public class RevCTRequestDTO {
 	
 	private String amount;
 	private String creditorName;

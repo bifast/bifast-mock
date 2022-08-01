@@ -14,7 +14,7 @@ import bifast.library.iso20022.custom.Document;
 import bifast.library.iso20022.head001.BusinessApplicationHeaderV01;
 import bifast.library.iso20022.pacs002.PaymentTransaction110;
 import bifast.mock.inbound.pojo.PaymentRequestPojo;
-import bifast.mock.inbound.pojo.RevCTPojo;
+import bifast.mock.incomingtrns.RevCTRequestDTO;
 import bifast.mock.isoservice.MsgHeaderService;
 import bifast.mock.isoservice.Pacs008MessageService;
 import bifast.mock.isoservice.Pacs008Seed;
@@ -37,7 +37,7 @@ public class BuildReversalRequestProcessor implements Processor {
 
 		logger.info("BuildCTRequestProcessor ");
 
-		RevCTPojo inbRequest = exchange.getMessage().getHeader("inb_revRequest", RevCTPojo.class);
+		RevCTRequestDTO inbRequest = exchange.getMessage().getHeader("inb_revRequest", RevCTRequestDTO.class);
 		BusinessMessage aeResponse = exchange.getProperty("aeresponse", BusinessMessage.class);
 		
 		PaymentTransaction110 crdtInfo = aeResponse.getDocument().getFiToFIPmtStsRpt().getTxInfAndSts().get(0);

@@ -1,101 +1,64 @@
 package bifast.mock.inbound;
 
-import java.math.BigDecimal;
+import java.util.Optional;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import bifast.library.iso20022.custom.BusinessMessage;
-import bifast.library.iso20022.custom.Document;
-import bifast.library.iso20022.head001.BusinessApplicationHeaderV01;
-import bifast.library.iso20022.pacs002.PaymentTransaction110;
-import bifast.mock.inbound.pojo.PaymentRequestPojo;
+import bifast.library.iso20022.pacs008.BranchAndFinancialInstitutionIdentification6;
+import bifast.library.iso20022.pacs008.CashAccount38;
+import bifast.library.iso20022.pacs008.PartyIdentification135;
+import bifast.mock.incomingtrns.RevCTNotFoundException;
 import bifast.mock.incomingtrns.RevCTRequestDTO;
-import bifast.mock.isoservice.MsgHeaderService;
-import bifast.mock.isoservice.Pacs008MessageService;
-import bifast.mock.isoservice.Pacs008Seed;
+import bifast.mock.persist.CTResponse;
+import bifast.mock.persist.CTResponseRepository;
 import bifast.mock.processor.UtilService;
 
 @Component
 public class BuildReversalRequestProcessor implements Processor {
 
-	@Autowired
-	private MsgHeaderService appHeaderService;
-	@Autowired
-	private Pacs008MessageService pacs008MessageService;
-	@Autowired
-	private UtilService utilService;
+	@Autowired private CTResponseRepository ctResponseRepo;
+	@Autowired private UtilService utilService;
 
-	private static Logger logger = LoggerFactory.getLogger(BuildReversalRequestProcessor.class);
+//	private static Logger logger = LoggerFactory.getLogger(BuildReversalRequestProcessor.class);
 
 	@Override
 	public void process(Exchange exchange) throws Exception {
 
-		logger.info("BuildCTRequestProcessor ");
-
-		RevCTRequestDTO inbRequest = exchange.getMessage().getHeader("inb_revRequest", RevCTRequestDTO.class);
-		BusinessMessage aeResponse = exchange.getProperty("aeresponse", BusinessMessage.class);
-		
-		PaymentTransaction110 crdtInfo = aeResponse.getDocument().getFiToFIPmtStsRpt().getTxInfAndSts().get(0);
-		Pacs008Seed seedCreditTrn = new Pacs008Seed();
-
-		
-		String msgType = "010";
+		RevCTRequestDTO revCt = exchange.getMessage().getBody(RevCTRequestDTO.class);
+		Optional<CTResponse> oCTResponse = ctResponseRepo.findByEndToEndId(revCt.getEndToEndId());
+		if (oCTResponse.isPresent()) {
+			CTResponse ctResponse = oCTResponse.get();
+			String strCTReq = ctResponse.getJsonCtRequest();
+			BusinessMessage ctReq = utilService.deserializeBusinessMessage(strCTReq);
 			
-		BusinessApplicationHeaderV01 hdr = new BusinessApplicationHeaderV01();
-
-		String bizMsgId = utilService.genRfiBusMsgId("011", "01", "BMNDIDJA" );
-		String msgId = utilService.genMessageId("011", "BMNDIDJA");
-
-		seedCreditTrn.setMsgId(msgId);
-		seedCreditTrn.setAmount(new BigDecimal(inbRequest.getAmount()));
-		seedCreditTrn.setBizMsgId(bizMsgId);
-		
-		seedCreditTrn.setCategoryPurpose("01");
-		
-		seedCreditTrn.setChannel("01");
-		
-		seedCreditTrn.setCrdtAccountNo(inbRequest.getCreditorAccountNo());		
-		seedCreditTrn.setCrdtAccountType(crdtInfo.getOrgnlTxRef().getCdtrAcct().getTp().getPrtry());
-		seedCreditTrn.setCrdtName(crdtInfo.getOrgnlTxRef().getCdtr().getPty().getNm());
-		
-		if (crdtInfo.getSplmtryData().size()>0) {
-			seedCreditTrn.setCrdtId(crdtInfo.getSplmtryData().get(0).getEnvlp().getDtl().getCdtr().getId());
-			seedCreditTrn.setCrdtType(crdtInfo.getSplmtryData().get(0).getEnvlp().getDtl().getCdtr().getTp());
-			seedCreditTrn.setCrdtResidentStatus(crdtInfo.getSplmtryData().get(0).getEnvlp().getDtl().getCdtr().getRsdntSts());
-			seedCreditTrn.setCrdtTownName(crdtInfo.getSplmtryData().get(0).getEnvlp().getDtl().getCdtr().getTwnNm());
+			String bizmsgidr = utilService.genHubBusMsgId("011");
+			ctReq.getAppHdr().setBizMsgIdr(bizmsgidr);
+			ctReq.getDocument().getFiToFICstmrCdtTrf().getCdtTrfTxInf().get(0).getPmtId().setEndToEndId(bizmsgidr);
+			ctReq.getDocument().getFiToFICstmrCdtTrf().getCdtTrfTxInf().get(0).getPmtId().setClrSysRef("001");
+			ctReq.getDocument().getFiToFICstmrCdtTrf().getCdtTrfTxInf().get(0).getSplmtryData().get(0).getEnvlp().getDtl().setRltdEndToEndId(revCt.getEndToEndId());
+			
+			BranchAndFinancialInstitutionIdentification6 cdtrAgt = ctReq.getDocument().getFiToFICstmrCdtTrf().getCdtTrfTxInf().get(0).getCdtrAgt();
+			PartyIdentification135 cdtr = ctReq.getDocument().getFiToFICstmrCdtTrf().getCdtTrfTxInf().get(0).getCdtr();
+			CashAccount38 cdtrAcct = ctReq.getDocument().getFiToFICstmrCdtTrf().getCdtTrfTxInf().get(0).getCdtrAcct();
+			
+			ctReq.getDocument().getFiToFICstmrCdtTrf().getCdtTrfTxInf().get(0).setCdtr(ctReq.getDocument().getFiToFICstmrCdtTrf().getCdtTrfTxInf().get(0).getDbtr());
+			ctReq.getDocument().getFiToFICstmrCdtTrf().getCdtTrfTxInf().get(0).setCdtrAcct(ctReq.getDocument().getFiToFICstmrCdtTrf().getCdtTrfTxInf().get(0).getDbtrAcct());
+			ctReq.getDocument().getFiToFICstmrCdtTrf().getCdtTrfTxInf().get(0).setCdtrAgt(ctReq.getDocument().getFiToFICstmrCdtTrf().getCdtTrfTxInf().get(0).getDbtrAgt());
+			
+			ctReq.getDocument().getFiToFICstmrCdtTrf().getCdtTrfTxInf().get(0).setDbtr(cdtr);
+			ctReq.getDocument().getFiToFICstmrCdtTrf().getCdtTrfTxInf().get(0).setDbtrAcct(cdtrAcct);
+			ctReq.getDocument().getFiToFICstmrCdtTrf().getCdtTrfTxInf().get(0).setDbtrAgt(cdtrAgt);
+			
+			exchange.getMessage().setBody(ctReq);
 		}
 		
-//		seedCreditTrn.setDbtrAccountNo(inbRequest.getDebtorAccountNo());
-//		seedCreditTrn.setDbtrAccountType("SVGS");
-//		seedCreditTrn.setDbtrName(inbRequest.getDebtorName());
-//		seedCreditTrn.setDbtrId("9999333339");
-//		seedCreditTrn.setDbtrType("01"); 
-//		seedCreditTrn.setDbtrResidentStatus("01");
-//		seedCreditTrn.setDbtrTownName("0300");
-
-		seedCreditTrn.setOrignBank("BMNDIDJA");
-		seedCreditTrn.setPaymentInfo("");
-		seedCreditTrn.setRecptBank("SIHBIDJ1");
-		
-		seedCreditTrn.setPaymentInfo(inbRequest.getPaymentInfo());
-		seedCreditTrn.setTrnType("010");
-		
-		BusinessMessage busMsg = new BusinessMessage();
-
-		hdr = appHeaderService.getAppHdr("pacs.008.001.08", bizMsgId);
-		busMsg.setAppHdr(hdr);
-
-		Document doc = new Document();
-		doc.setFiToFICstmrCdtTrf(pacs008MessageService.creditTransferRequest(seedCreditTrn));
-		
-		busMsg.setDocument(doc);
-
-		exchange.getIn().setBody(busMsg);
+		else {
+			throw new RevCTNotFoundException("CreditTransfer Not Found.") ;
+		}
 		
 	}
 

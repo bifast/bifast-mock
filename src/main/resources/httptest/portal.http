@@ -2,3 +2,9 @@ POST http://localhost:9006/mock/portalapi HTTP/1.1
 Content-Type: application/json
 
 {"apimessage":{"codelog":"AE","data":{"komi_unique_id":"667554","komi_trx_no":"20211220O00000606","channel_type":"01","trx_type":"O","trx_initiation_date":"2021-12-20 10:42:56","trx_duration":"1358","sender_bank":"SIHBIDJ1","recipient_bank":"BRINIDJA","bifast_trx_no":"20211220SIHBIDJ1510O0100000606","recipient_account_no":"992211777","sender_account_no":"14395230","proxyFlag":"T","trx_amount":"24520024.10","status_code":"SUCCESS","response_code":"RJCT","reason_code":"U215","reason_message":"Message Rejected with Admi.002"}}}
+
+###
+POST http://10.11.103.65:9004/komi/v1/external/logging/insert HTTP/1.1
+Content-Type: application/json
+
+{"apimessage":{"codelog":"RCT","data":{"komi_unique_id":"20220802SIHBIDJ1010O0244906003","komi_trx_no":"20220802R46589016","channel_type":"99","trx_type":"I","trx_initiation_date":"2022-08-02 12:56:29","trx_duration":"56","sender_bank":"CENAIDJA","recipient_bank":"FASTIDJA","bifast_trx_no":"20220802FASTIDJA011H9900001601","recipient_account_no":"2012102710197","recipient_account_name":"SULISTIYOWATI","sender_account_no":"112211333","proxyFlag":"T","trx_amount":"80000.00","status_code":"SUCCESS","response_code":"RJCT","reason_code":"62","reason_message":"Transaction Not Allowed."}}}

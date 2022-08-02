@@ -11,9 +11,9 @@
 #localhost:9002/komi-outbound/routing/
 #localhost:9002/komi-outbound/service/
 
-POST http://localhost:9002/komi-outbound/service HTTP/1.1
+POST http://10.11.103.65:9002/komi-outbound/service HTTP/1.1
 Content-Type: application/json
-Authorization: Basic MB:password
+Authorization: Basic MB:mb2022
 
 {
   "CreditTransferRequest": {
@@ -21,7 +21,7 @@ Authorization: Basic MB:password
     "TerminalId": "MOBILE0001",
     "RecipientBank": "CENAIDJA",
     "CategoryPurpose": "02",
-    "Amount": "95000.00",
+    "Amount": "80000.00",
     "FeeTransfer": "0.00",
     "DebtorName": "SULISTIYOWATI",
     "DebtorAccountNumber": "2012102710197",
@@ -36,28 +36,27 @@ Authorization: Basic MB:password
 }
 
 ###
-
-###
-POST http://localhost:9002/komi-outbound/routing HTTP/1.1
+POST http://localhost:9002/komi-outbound/service HTTP/1.1
 Content-Type: application/json
+Authorization: Basic MB:mb2022
 
 {
-  "CreditTransferRequest" : {
-    "orignReffId" : "324521",
-    "channel" : "01",
-    "categoryPurpose" : "02",
-    "amount" : 825200,
-    "crdtAccountNo" : "262222",
-    "crdtAccountType" : "SVGS",
-    "dbtrIdType" : "01",    
-    "dbtrName": "Fandi Wijaya",
-    "dbtrId" : "01445",
-    "dbtrAccountNo" : "783784",
-    "dbtrAccountType" : "CACC",
-    "recptBank" : "BMRIIDJA",
-    "crdtIdType" : "02",   
-    "crdtName": "P AI",
-    "crdtId" : "C4403"
+  "CreditTransferRequest": {
+    "NoRef": "MOB22072603571{{$randomInt 0000 9999}}",
+    "TerminalId": "MOBILE0001",
+    "RecipientBank": "CENAIDJA",
+    "CategoryPurpose": "02",
+    "Amount": "80000.00",
+    "FeeTransfer": "0.00",
+    "DebtorName": "SULISTIYOWATI",
+    "DebtorAccountNumber": "2012102710197",
+    "DebtorAccountType": "SVGS",
+    "DebtorId": "1002222",
+    "DebtorType": "01",
+    "CreditorName": "ANDRIAN S",
+    "CreditorAccountNumber": "112211333",
+    "CreditorAccountType": "CACC",
+    "PaymentInformation": ""
   }
 }
 

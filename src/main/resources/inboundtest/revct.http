@@ -10,16 +10,27 @@ Content-Type: application/json
 {"BusMsg":{"AppHdr":{"Fr":{"FIId":{"FinInstnId":{"Othr":{"Id":"SIHBIDJ1"}}}},"To":{"FIId":{"FinInstnId":{"Othr":{"Id":"FASTIDJA"}}}},"BizMsgIdr":"20220726FASTIDJA011H9920322602","MsgDefIdr":"admi.002.001.01","CreDt":"2022-07-25T20:58:05Z"},"Document":{"MessageReject":{"RltdRef":{"Ref":"20220726BMRIIDJA011O9900379830"},"Rsn":{"RjctgPtyRsn":"0015","RjctnDtTm":"2022-07-26T03:58:05.915","ErrLctn":"endpoint","RsnDesc":"Inbound validation failed: Invalid Originator value in BizMsgIdr.","AddtlData":"<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"no\" ?><ns:BusMsg xmlns:ns=\"urn:iso\" xmlns:ns1=\"urn:iso:std:iso:20022:tech:xsd:head.001.001.01\" xmlns:ns2=\"urn:iso:std:iso:20022:tech:xsd:pacs.008.001.08\"><ns:AppHdr><ns1:Fr><ns1:FIId><ns1:FinInstnId><ns1:Othr><ns1:Id>FASTIDJA</ns1:Id></ns1:Othr></ns1:FinInstnId></ns1:FIId></ns1:Fr><ns1:To><ns1:FIId><ns1:FinInstnId><ns1:Othr><ns1:Id>SIHBIDJ1</ns1:Id></ns1:Othr></ns1:FinInstnId></ns1:FIId></ns1:To><ns1:BizMsgIdr>20220726FASTIDJA011H9920322602</ns1:BizMsgIdr><ns1:MsgDefIdr>pacs.008.001.08</ns1:MsgDefIdr><ns1:CreDt>2022-07-25T20:58:05Z</ns1:CreDt></ns:AppHdr><ns:Document><ns:FIToFICstmrCdtTrf><ns2:GrpHdr><ns2:MsgId>20220726BMRIIDJA0111127615611</ns2:MsgId><ns2:CreDtTm>2022-07-26T03:58:04.023</ns2:CreDtTm><ns2:NbOfTxs>1</ns2:NbOfTxs><ns2:SttlmInf><ns2:SttlmMtd>CLRG</ns2:SttlmMtd></ns2:SttlmInf></ns2:GrpHdr><ns2:CdtTrfTxInf><ns2:PmtId><ns2:EndToEndId>20220726BMRIIDJA011O9900379830</ns2:EndToEndId><ns2:TxId>20220726SIHBIDJ1010O0214234343</ns2:TxId></ns2:PmtId><ns2:PmtTpInf><ns2:LclInstrm><ns2:Prtry>99</ns2:Prtry></ns2:LclInstrm><ns2:CtgyPurp><ns2:Prtry>01199</ns2:Prtry></ns2:CtgyPurp></ns2:PmtTpInf><ns2:IntrBkSttlmAmt Ccy=\"IDR\">9500000.00</ns2:IntrBkSttlmAmt><ns2:ChrgBr>DEBT</ns2:ChrgBr><ns2:Dbtr><ns2:Nm>SULISTIYOWATI</ns2:Nm><ns2:Id><ns2:PrvtId><ns2:Othr><ns2:Id>3674064910600006</ns2:Id></ns2:Othr></ns2:PrvtId></ns2:Id></ns2:Dbtr><ns2:DbtrAcct><ns2:Id><ns2:Othr><ns2:Id>1240001011361</ns2:Id></ns2:Othr></ns2:Id><ns2:Tp><ns2:Prtry>SVGS</ns2:Prtry></ns2:Tp></ns2:DbtrAcct><ns2:DbtrAgt><ns2:FinInstnId><ns2:Othr><ns2:Id>BMRIIDJA</ns2:Id></ns2:Othr></ns2:FinInstnId></ns2:DbtrAgt><ns2:CdtrAgt><ns2:FinInstnId><ns2:Othr><ns2:Id>SIHBIDJ1</ns2:Id></ns2:Othr></ns2:FinInstnId></ns2:CdtrAgt><ns2:Cdtr><ns2:Nm>SULISTIYOWATI</ns2:Nm></ns2:Cdtr><ns2:CdtrAcct><ns2:Id><ns2:Othr><ns2:Id>2012102710197</ns2:Id></ns2:Othr></ns2:Id><ns2:Tp><ns2:Prtry>SVGS</ns2:Prtry></ns2:Tp></ns2:CdtrAcct><ns2:RmtInf><ns2:Ustrd>0</ns2:Ustrd></ns2:RmtInf><ns2:SplmtryData><ns2:Envlp><Dtl><Dbtr><Tp>01</Tp></Dbtr><RltdEndToEndId>20220726SIHBIDJ1010O0214234343</RltdEndToEndId></Dtl></ns2:Envlp></ns2:SplmtryData></ns2:CdtTrfTxInf></ns:FIToFICstmrCdtTrf></ns:Document></ns:BusMsg>"}}}}}
 
 ###
+POST http://10.11.103.65:9006/mock/inbound HTTP/1.1
+Content-Type: application/json
+
+{
+    "ReversalCT": {
+        "amount": "80000.00",
+        "creditorName": "SULISTIYOWATI",
+        "creditorAccountNo": "2012102710197",
+        "endToEndId": "20220802SIHBIDJ1010O0272040005"
+    }
+}
+
+###
 POST http://localhost:9006/mock/inbound HTTP/1.1
 Content-Type: application/json
 
 {
     "ReversalCT": {
-        "amount": "10000",
+        "amount": "80000.00",
         "creditorName": "SULISTIYOWATI",
         "creditorAccountNo": "2012102710197",
-        "endToEndId": "20220801SIHBIDJ1010O0229740005",
-        "paymentInfo": ""
+        "endToEndId": "20220802SIHBIDJ1010O0270973001"
     }
 }
-

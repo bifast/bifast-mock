@@ -101,7 +101,7 @@ public class CreditTransferResponseProcessor implements Processor{
 			
 			// kirim settlement jika ctResponse.getResponse = ACTC
 			if (ctResponse.getResponse().equals("ACTC")) {
-				TimeUnit.SECONDS.sleep(2);
+				TimeUnit.SECONDS.sleep(5);
 	            FluentProducerTemplate pt = exchange.getContext().createFluentProducerTemplate();
 	            pt.withExchange(exchange).to("seda:settlement?exchangePattern=InOnly&timeout=0").asyncSend();
 			}

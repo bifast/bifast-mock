@@ -1,9 +1,8 @@
 package bifast.mock.incomingtrns;
 
-import java.util.Optional;
-
 import org.apache.camel.Exchange;
 import org.apache.camel.ExchangePattern;
+import org.apache.camel.LoggingLevel;
 import org.apache.camel.Processor;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.jackson.JacksonDataFormat;
@@ -15,18 +14,13 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.module.jaxb.JaxbAnnotationModule;
 
 import bifast.library.iso20022.custom.BusinessMessage;
-import bifast.library.iso20022.pacs008.BISupplementaryData1;
-import bifast.library.iso20022.pacs008.BISupplementaryDataEnvelope1;
-import bifast.library.iso20022.pacs008.BranchAndFinancialInstitutionIdentification6;
-import bifast.library.iso20022.pacs008.CashAccount38;
-import bifast.library.iso20022.pacs008.PartyIdentification135;
-import bifast.library.iso20022.pacs008.SupplementaryDataEnvelope1;
-import bifast.mock.persist.CTResponse;
+import bifast.mock.inbound.BuildReversalRequestProcessor;
 import bifast.mock.persist.CTResponseRepository;
 import bifast.mock.processor.UtilService;
 
 @Component
 public class InboundReversalCTRoute extends RouteBuilder{
+	@Autowired BuildReversalRequestProcessor buildReversalRequestProc;
 	@Autowired CTResponseRepository ctResponseRepo;
 	@Autowired UtilService utilService;
 
@@ -48,10 +42,9 @@ public class InboundReversalCTRoute extends RouteBuilder{
 
 		
 		onException(bifast.mock.incomingtrns.RevCTNotFoundException.class)
-			.log("error")
+			.log(LoggingLevel.ERROR, "${exception.stacktrace}")
 			.process(new Processor() {
 				public void process(Exchange exchange) throws Exception {
-					RevCTRequestDTO revCt = exchange.getMessage().getBody(RevCTRequestDTO.class);
 					RevCTResponseDTO resp = new RevCTResponseDTO();
 					resp.setEndToEndId(exchange.getMessage().getHeader("revct_e2eid", String.class));
 					resp.setResponse("RJCT");
@@ -67,56 +60,24 @@ public class InboundReversalCTRoute extends RouteBuilder{
 
 			.setHeader("revct_e2eid", simple("${body.endToEndId}"))
 
-			.process(new Processor() {
-				public void process(Exchange exchange) throws Exception {
-					RevCTRequestDTO revCt = exchange.getMessage().getBody(RevCTRequestDTO.class);
-					Optional<CTResponse> oCTResponse = ctResponseRepo.findByEndToEndId(revCt.getEndToEndId());
-					if (oCTResponse.isPresent()) {
-						CTResponse ctResponse = oCTResponse.get();
-						String strCTReq = ctResponse.getJsonCtRequest();
-						BusinessMessage ctReq = utilService.deserializeBusinessMessage(strCTReq);
-						
-						String bizmsgidr = utilService.genHubBusMsgId("011");
-						
-						BranchAndFinancialInstitutionIdentification6 cdtrAgt = ctReq.getDocument().getFiToFICstmrCdtTrf().getCdtTrfTxInf().get(0).getCdtrAgt();
-						PartyIdentification135 cdtr = ctReq.getDocument().getFiToFICstmrCdtTrf().getCdtTrfTxInf().get(0).getCdtr();
-						CashAccount38 cdtrAcct = ctReq.getDocument().getFiToFICstmrCdtTrf().getCdtTrfTxInf().get(0).getCdtrAcct();
-						
-						ctReq.getAppHdr().setBizMsgIdr(bizmsgidr);
-						ctReq.getDocument().getFiToFICstmrCdtTrf().getCdtTrfTxInf().get(0).getPmtId().setClrSysRef("001");
-						
-						ctReq.getDocument().getFiToFICstmrCdtTrf().getCdtTrfTxInf().get(0).setCdtr(ctReq.getDocument().getFiToFICstmrCdtTrf().getCdtTrfTxInf().get(0).getDbtr());
-						ctReq.getDocument().getFiToFICstmrCdtTrf().getCdtTrfTxInf().get(0).setCdtrAcct(ctReq.getDocument().getFiToFICstmrCdtTrf().getCdtTrfTxInf().get(0).getDbtrAcct());
-						ctReq.getDocument().getFiToFICstmrCdtTrf().getCdtTrfTxInf().get(0).setCdtrAgt(ctReq.getDocument().getFiToFICstmrCdtTrf().getCdtTrfTxInf().get(0).getDbtrAgt());
-						
-						ctReq.getDocument().getFiToFICstmrCdtTrf().getCdtTrfTxInf().get(0).setDbtr(cdtr);
-						ctReq.getDocument().getFiToFICstmrCdtTrf().getCdtTrfTxInf().get(0).setDbtrAcct(cdtrAcct);
-						ctReq.getDocument().getFiToFICstmrCdtTrf().getCdtTrfTxInf().get(0).setDbtrAgt(cdtrAgt);
-						
-						BISupplementaryData1 splmtryData = new BISupplementaryData1();
-						splmtryData.setEnvlp(new SupplementaryDataEnvelope1());
-						splmtryData.getEnvlp().setDtl(new BISupplementaryDataEnvelope1());
-						splmtryData.getEnvlp().getDtl().setRltdEndToEndId(revCt.getEndToEndId());
-						ctReq.getDocument().getFiToFICstmrCdtTrf().getCdtTrfTxInf().get(0).getSplmtryData().add(splmtryData);
-						
-						exchange.getMessage().setBody(ctReq);
-					}
-					
-					else {
-						throw new RevCTNotFoundException("CreditTransfer Not Found.") ;
-					}
-				}
-			})
-			
-			
+			.process(buildReversalRequestProc)
+			.setHeader("inb_ctRequest", simple("${body}"))
+
 			.marshal(busMesgJDF)
-			.log("${body}")
+			.log("Reversal request: ${body}")
 
 			.to("rest:post:?host={{komi.inbound-url}}"
 					+ "&exchangePattern=InOnly&bridgeEndpoint=true")
 			.convertBodyTo(String.class)
+			.log("Reversal response: ${body}")
 			.unmarshal(busMesgJDF)
 			
+			.filter().simple("${body.document.fiToFIPmtStsRpt.txInfAndSts[0].txSts} == 'ACTC'")
+				.log("akan kirim settlement")
+				.setExchangePattern(ExchangePattern.InOnly)
+				.to("seda:inb_settlement")
+			.end()
+
 			.process(new Processor() {
 				public void process(Exchange exchange) throws Exception {
 					BusinessMessage revCtResp = exchange.getMessage().getBody(BusinessMessage.class);

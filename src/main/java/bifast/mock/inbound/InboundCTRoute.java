@@ -65,10 +65,7 @@ public class InboundCTRoute extends RouteBuilder{
 			.marshal(busMesgJDF)
 			.log("Settlement: ${body}")	
 	
-			.to("rest:post:?host={{komi.inbound-url}}"
-	//			+ "&exchangePattern=InOnly"
-					+ "&bridgeEndpoint=true"
-				)
+			.to("rest:post:?host={{komi.inbound-url}}&bridgeEndpoint=true")
 			.convertBodyTo(String.class)
 		;
 

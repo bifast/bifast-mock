@@ -2,14 +2,12 @@ package bifast.mock;
 
 import java.util.Optional;
 
-import org.apache.camel.CamelContext;
 import org.apache.camel.ExchangePattern;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.test.spring.junit5.CamelSpringBootTest;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -26,7 +24,6 @@ import bifast.mock.persist.AccountProxyRepository;
 public class AProxyRegTest {
 	@Autowired AccountProxyRepository proxyRepo;
 	@Autowired ProducerTemplate producerTemplate;
-	@Autowired CamelContext camelContext;
 	@Autowired TestUtilService utilService;
 
 //	@Test

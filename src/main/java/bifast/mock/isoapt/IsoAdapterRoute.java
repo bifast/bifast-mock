@@ -109,6 +109,7 @@ public class IsoAdapterRoute extends RouteBuilder {
 				
 			.post("/credit")
 				.consumes("application/json")
+				.produces("application/json")
 				.to("direct:credit")
 				
 			.post("/settlement")
@@ -139,6 +140,7 @@ public class IsoAdapterRoute extends RouteBuilder {
 			.unmarshal(debitRequestJDF)
 			.process(debitRequestPrc)
 			.marshal(debitResponseJDF)
+			.convertBodyTo(String.class)
 			.log("Debit response: ${body}")
 			;
 
@@ -157,6 +159,7 @@ public class IsoAdapterRoute extends RouteBuilder {
 			.unmarshal(creditRequestJDF)
 			.process(creditRequestPrc)
 			.marshal(creditResponseJDF)
+			.convertBodyTo(String.class)
 			.log("Credit response: ${body}")
 
 			;

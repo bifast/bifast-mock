@@ -15,6 +15,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.module.jaxb.JaxbAnnotationModule;
 
 import bifast.library.iso20022.custom.BusinessMessage;
+import bifast.mock.isoapt.pojo.CreditResponse;
 
 @Service
 public class TestUtilService {
@@ -69,8 +70,17 @@ public class TestUtilService {
 	    mapper.registerModule(new JaxbAnnotationModule());
 	    mapper.enable(DeserializationFeature.UNWRAP_ROOT_VALUE);
 	    mapper.setSerializationInclusion(Include.NON_NULL);
-	    BusinessMessage bm = mapper.readValue(str, BusinessMessage.class);
-		return bm;
+	    BusinessMessage cr = mapper.readValue(str, BusinessMessage.class);
+		return cr;
+	}
+
+	public CreditResponse deserializeCreditResponse (String str) throws JsonProcessingException {
+	    ObjectMapper mapper = new ObjectMapper();
+	    mapper.registerModule(new JaxbAnnotationModule());
+//	    mapper.enable(DeserializationFeature.UNWRAP_ROOT_VALUE);
+	    mapper.setSerializationInclusion(Include.NON_NULL);
+	    CreditResponse cr = mapper.readValue(str, CreditResponse.class);
+		return cr;
 	}
 
 }

@@ -40,7 +40,7 @@ public class SettlementSedaRoute extends RouteBuilder {
 	
 		from("seda:settlement")
 			.routeId("settlement")
-
+			.delay(5000)
 			.process(settlementProc)
 		
 			.marshal(jsonBusinessMessageDataFormat)

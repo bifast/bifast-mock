@@ -15,6 +15,7 @@ import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 
 import bifast.library.iso20022.custom.BusinessMessage;
 import bifast.mock.persist.AccountProxyRepository;
@@ -81,7 +82,7 @@ public class CreditTransferTest {
 
 	}
 
-	@Test
+//	@Test
     @Order(2)    
 	public void CrdTrnsRjct() throws Exception {
 		// Credit Transfer Request

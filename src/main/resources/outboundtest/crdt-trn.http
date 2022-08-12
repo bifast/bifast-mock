@@ -42,12 +42,12 @@ Authorization: Basic MB:mb2022
 
 {
   "CreditTransferRequest": {
-    "NoRef": "MOB22072603571{{$randomInt 0000 9999}}",
+    "NoRef": "TES22072603571{{$randomInt 0000 9999}}",
     "TerminalId": "MOBILE0001",
     "RecipientBank": "CENAIDJA",
     "CategoryPurpose": "02",
     "Amount": "80000.00",
-    "FeeTransfer": "0.00",
+    "FeeTransfer": "2500.00",
     "DebtorName": "SULISTIYOWATI",
     "DebtorAccountNumber": "2012102710197",
     "DebtorAccountType": "SVGS",

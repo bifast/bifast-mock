@@ -13,7 +13,7 @@
 
 POST http://10.11.103.65:9002/komi-outbound/service HTTP/1.1
 Content-Type: application/json
-Authorization: Basic MB:mb2022
+Authorization: Basic CB:password
 
 {
   "CreditTransferRequest": {
@@ -38,7 +38,7 @@ Authorization: Basic MB:mb2022
 ###
 POST http://localhost:9002/komi-outbound/service HTTP/1.1
 Content-Type: application/json
-Authorization: Basic MB:mb2022
+Authorization: Basic CB:password
 
 {
   "CreditTransferRequest": {

@@ -18,7 +18,7 @@ Content-Type: application/json
         "amount": "80000.00",
         "creditorName": "SULISTIYOWATI",
         "creditorAccountNo": "2012102710197",
-        "endToEndId": "20220810SIHBIDJ1010O0254516002"
+        "endToEndId": "20220815SIHBIDJ1010O0379589800"
     }
 }
 
@@ -31,6 +31,6 @@ Content-Type: application/json
         "amount": "80000.00",
         "creditorName": "SULISTIYOWATI",
         "creditorAccountNo": "2012102710197",
-        "endToEndId": "20220812SIHBIDJ1010O0264601002"
+        "endToEndId": "20220815SIHBIDJ1010O0378499002"
     }
 }

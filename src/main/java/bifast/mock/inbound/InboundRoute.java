@@ -32,7 +32,7 @@ public class InboundRoute extends RouteBuilder {
 	JacksonDataFormat paymtRequestJDF = new JacksonDataFormat(PaymentRequestPojo.class);
 
 	private void configureJson() {
-		mockRequestWrapperJDF.addModule(new JaxbAnnotationModule());  //supaya nama element pake annot JAXB (uppercasecamel)
+//		mockRequestWrapperJDF.addModule(new JaxbAnnotationModule());  //supaya nama element pake annot JAXB (uppercasecamel)
 		mockRequestWrapperJDF.setInclude("NON_NULL");
 		mockRequestWrapperJDF.setInclude("NON_EMPTY");
 //		mockRequestWrapperJDF.enableFeature(DeserializationFeature.UNWRAP_ROOT_VALUE);
